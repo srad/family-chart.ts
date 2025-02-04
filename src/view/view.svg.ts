@@ -1,6 +1,6 @@
-import d3 from "../d3.js"
+import d3 from "../d3";
 
-export default function createSvg(cont, props={}) {
+export default function createSvg(cont, props = {}) {
   const svg_dim = cont.getBoundingClientRect();
   const svg_html = (`
     <svg class="main_svg">
@@ -11,53 +11,61 @@ export default function createSvg(cont, props={}) {
       </g>
       <g style="transform: translate(100%, 100%)">
         <g class="fit_screen_icon cursor-pointer" style="transform: translate(-50px, -50px); display: none">
-          <rect width="27" height="27" stroke-dasharray="${27/2}" stroke-dashoffset="${27/4}" 
+          <rect width="27" height="27" stroke-dasharray="${27 / 2}" stroke-dashoffset="${27 / 4}" 
             style="stroke:#fff;stroke-width:4px;fill:transparent;"/>
-          <circle r="5" cx="${27/2}" cy="${27/2}" style="fill:#fff" />          
+          <circle r="5" cx="${27 / 2}" cy="${27 / 2}" style="fill:#fff" />          
         </g>
       </g>
     </svg>
-  `)
+  `);
 
-  const f3Canvas = getOrCreateF3Canvas(cont)
+  const f3Canvas = getOrCreateF3Canvas(cont);
 
-  const temp_div = d3.create('div').node()
-  temp_div.innerHTML = svg_html
-  const svg = temp_div.querySelector('svg')
-  f3Canvas.appendChild(svg)
+  const temp_div = d3.create("div").node();
+  temp_div.innerHTML = svg_html;
+  const svg = temp_div.querySelector("svg");
+  f3Canvas.appendChild(svg);
 
-  cont.appendChild(f3Canvas)
+  cont.appendChild(f3Canvas);
 
-  setupZoom(f3Canvas, props)
+  setupZoom(f3Canvas, props);
 
-  return svg
+  return svg;
 
   function getOrCreateF3Canvas(cont) {
-    let f3Canvas = cont.querySelector('#f3Canvas')
+    let f3Canvas = cont.querySelector("#f3Canvas");
     if (!f3Canvas) {
-      f3Canvas = d3.create('div').attr('id', 'f3Canvas').attr('style', 'position: relative; overflow: hidden; width: 100%; height: 100%;').node()
+      f3Canvas = d3.create("div").attr("id", "f3Canvas").attr("style", "position: relative; overflow: hidden; width: 100%; height: 100%;").node();
     }
-    return f3Canvas
+    return f3Canvas;
   }
 }
 
-function setupZoom(el, props={}) {
-  if (el.__zoom) return
-  const view = el.querySelector('.view'),
-    zoom = d3.zoom().on("zoom", (props.onZoom || zoomed))
+function setupZoom(el, props = {}) {
+  if (el.__zoom) {
+    return;
+  }
+  const view = el.querySelector(".view"),
+    zoom = d3.zoom().on("zoom", (props.onZoom || zoomed));
 
-  d3.select(el).call(zoom)
-  el.__zoomObj = zoom
+  d3.select(el).call(zoom);
+  el.__zoomObj = zoom;
 
-  if (props.zoom_polite) zoom.filter(zoomFilter)
+  if (props.zoom_polite) {
+    zoom.filter(zoomFilter);
+  }
 
   function zoomed(e) {
     d3.select(view).attr("transform", e.transform);
   }
 
   function zoomFilter(e) {
-    if (e.type === "wheel" && !e.ctrlKey) return false
-    else if (e.touches && e.touches.length < 2) return false
-    else return true
+    if (e.type === "wheel" && !e.ctrlKey) {
+      return false;
+    } else if (e.touches && e.touches.length < 2) {
+      return false;
+    } else {
+      return true;
+    }
   }
 }
