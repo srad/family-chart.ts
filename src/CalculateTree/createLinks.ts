@@ -1,3 +1,5 @@
+import { PersonData } from './CalculateTree';
+
 export function createLinks({ d, tree, is_horizontal = false }) {
   const links = [];
 
@@ -9,7 +11,7 @@ export function createLinks({ d, tree, is_horizontal = false }) {
 
   return links;
 
-  function handleAncestrySide({ d }) {
+  function handleAncestrySide({ d }: {d: PersonData}) {
     if (!d.parents) {
       return;
     }

@@ -1,19 +1,48 @@
-import d3 from "../d3";
+import { zoomIdentity, select } from 'd3';
 
-function positionTree({ t, svg, transition_time = 2000 }) {
-  const el_listener = svg.__zoomObj ? svg : svg.parentNode;  // if we need listener for svg and html, we will use parent node
-  const zoom = el_listener.__zoomObj;
-
-  d3.select(el_listener).transition().duration(transition_time || 0).delay(transition_time ? 100 : 0)  // delay 100 because of weird error of undefined something in d3 zoom
-    .call(zoom.transform, d3.zoomIdentity.scale(t.k).translate(t.x, t.y));
+export class SvgNode extends Element {
+  public __zoomObj: any; // TODO: Is this some d3 super duper object?
+  public transform: string;
+  public parentNode: SvgNode;
 }
 
-export function treeFit({ svg, svg_dim, tree_dim, with_transition, transition_time }) {
+function positionTree({ t, svg, transition_time = 2000 }: { t: { x: number; y: number, k: number }, svg: SvgNode, transition_time: number, with_transition: boolean }) {
+  const el_listener = svg.__zoomObj ? svg : svg.parentNode;  // if we need listener for svg and html, we will use parent node
+  // TODO: What is going on here? Why parent node?
+  const zoom = el_listener.__zoomObj;
+
+  select(el_listener)
+    .transition()
+    .duration(transition_time || 0)
+    .delay(transition_time ? 100 : 0)  // delay 100 because of weird error of undefined something in d3 zoom
+    .call(zoom.transform, zoomIdentity.scale(t.k).translate(t.x, t.y));
+}
+
+export type TreeFitOptions = {
+  svg: SvgNode;
+  svg_dim: DOMRect;
+  tree_dim: TreeDim;
+  with_transition?: boolean;
+  transition_time: number;
+};
+
+export function treeFit({ svg, svg_dim, tree_dim, with_transition, transition_time }: TreeFitOptions) {
   const t = calculateTreeFit(svg_dim, tree_dim);
   positionTree({ t, svg, with_transition, transition_time });
 }
 
-export function calculateTreeFit(svg_dim, tree_dim) {
+export type SvgDim = {
+  x: number, y: number, k: number, width?: number, height?: number;
+};
+
+export type TreeDim = {
+  x_off: number;
+  y_off: number;
+  height: number;
+  width: number;
+};
+
+export function calculateTreeFit(svg_dim: SvgDim, tree_dim: TreeDim): SvgDim {
   let k = Math.min(svg_dim.width / tree_dim.width, svg_dim.height / tree_dim.height);
   if (k > 1) {
     k = 1;

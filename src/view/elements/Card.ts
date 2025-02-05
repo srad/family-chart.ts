@@ -1,38 +1,43 @@
-import d3 from "../../d3";
-import { appendTemplate, CardBodyOutline } from "./Card.templates";
-import cardElements, { appendElement } from "./Card.elements";
-import setupCardSvgDefs from "./Card.defs";
+import { appendTemplate, CardBodyOutline } from './Card.templates';
+import cardElements, { appendElement } from './Card.elements';
+import setupCardSvgDefs from './Card.defs';
+import { create } from 'd3';
 
 export function Card(props) {
   props = setupProps(props);
   setupCardSvgDefs(props.svg, props.card_dim);
 
   return function (d) {
-    const gender_class = d.data.data.gender === "M" ? "card-male" : d.data.data.gender === "F" ? "card-female" : "card-genderless";
+    const gender_class = d.data.data.gender === 'M' ? 'card-male' : d.data.data.gender === 'F' ? 'card-female' : 'card-genderless';
     const card_dim = props.card_dim;
 
-    const card = d3.create("svg:g").attr("class", `card ${gender_class}`).attr("transform", `translate(${[ -card_dim.w / 2, -card_dim.h / 2 ]})`);
-    card.append("g").attr("class", "card-inner").attr("clip-path", "url(#card_clip)");
+    const card = create('svg:g')
+      .attr('class', `card ${gender_class}`)
+      .attr('transform', `translate(${[-card_dim.w / 2, -card_dim.h / 2]})`);
 
-    this.innerHTML = "";
+    card.append('g')
+      .attr('class', 'card-inner')
+      .attr('clip-path', 'url(#card_clip)');
+
+    this.innerHTML = '';
     this.appendChild(card.node());
 
     appendTemplate(CardBodyOutline({ d, card_dim, is_new: d.data.to_add }).template, card.node(), true);
-    appendElement(cardElements.cardBody(d, props), this.querySelector(".card-inner"));
+    appendElement(cardElements.cardBody(d, props), this.querySelector('.card-inner'));
 
     if (props.img) {
-      appendElement(cardElements.cardImage(d, props), this.querySelector(".card"));
+      appendElement(cardElements.cardImage(d, props), this.querySelector('.card'));
     }
     if (props.mini_tree) {
-      appendElement(cardElements.miniTree(d, props), this.querySelector(".card"), true);
+      appendElement(cardElements.miniTree(d, props), this.querySelector('.card'), true);
     }
     if (props.link_break) {
-      appendElement(cardElements.lineBreak(d, props), this.querySelector(".card"));
+      appendElement(cardElements.lineBreak(d, props), this.querySelector('.card'));
     }
 
     if (props.cardEditForm) {
-      appendElement(cardElements.cardEdit(d, props), this.querySelector(".card-inner"));
-      appendElement(cardElements.cardAdd(d, props), this.querySelector(".card-inner"));
+      appendElement(cardElements.cardEdit(d, props), this.querySelector('.card-inner'));
+      appendElement(cardElements.cardAdd(d, props), this.querySelector('.card-inner'));
     }
 
     if (props.onCardUpdates) {
@@ -54,7 +59,7 @@ export function Card(props) {
       props = {};
     }
     for (const k in default_props) {
-      if (typeof props[k] === "undefined") {
+      if (typeof props[k] === 'undefined') {
         props[k] = default_props[k];
       }
     }

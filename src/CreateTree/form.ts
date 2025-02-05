@@ -1,17 +1,44 @@
-import { checkIfRelativesConnectedWithoutPerson } from "./checkIfRelativesConnectedWithoutPerson";
-import { createTreeDataWithMainNode } from "./newPerson";
+import { checkIfRelativesConnectedWithoutPerson } from './checkIfRelativesConnectedWithoutPerson';
+import { createTreeDataWithMainNode } from './newPerson';
+import { DatumType } from '../Cards/CardBase';
 
-export function createForm({ datum, store, fields, postSubmit, addRelative, deletePerson, onCancel, editFirst }) {
-  const form_creator = {
+export type GenderField = {
+  id: string;
+  type: string;
+  label: string;
+  initial_value: DatumType;
+  options: { value: string, label: string }[];
+}
+
+export type Form = {
+  other_parent_field: boolean;
+  fields: any[];
+  onSubmit: (e: Event) => void;
+  onDelete?: () => void;
+  addRelative?: () => void;
+  addRelativeCancel?: () => void;
+  addRelativeActive?: boolean;
+  onCancel?: () => void;
+  editable?: boolean;
+  title?: string;
+  new_rel?: boolean;
+  can_delete?: boolean;
+  gender_field?: GenderField;
+  no_edit?: boolean;
+}
+
+export type CardDisplay = string | (() => void) | [];
+
+export function createForm({ datum, store, fields, postSubmit, addRelative, deletePerson, onCancel, editFirst }): Form {
+  const form_creator: Form = {
     fields: [],
     onSubmit: submitFormChanges,
   };
   if (!datum._new_rel_data) {
     form_creator.onDelete = deletePersonWithPostSubmit;
-    form_creator.addRelative = () => addRelative.activate(datum),
-      form_creator.addRelativeCancel = () => addRelative.onCancel();
+    form_creator.addRelative = () => addRelative.activate(datum);
+    form_creator.addRelativeCancel = () => addRelative.onCancel();
     form_creator.addRelativeActive = addRelative.is_active;
-
     form_creator.editable = false;
   }
   if (datum._new_rel_data) {
@@ -29,11 +56,11 @@ export function createForm({ datum, store, fields, postSubmit, addRelative, dele
   }
 
   form_creator.gender_field = {
-    id: "gender",
-    type: "switch",
-    label: "Gender",
+    id: 'gender',
+    type: 'switch',
+    label: 'Gender',
     initial_value: datum.data.gender,
-    options: [ { value: "M", label: "Male" }, { value: "F", label: "Female" } ]
+    options: [{ value: 'M', label: 'Male' }, { value: 'F', label: 'Female' }]
   };
 
   fields.forEach(d => {
@@ -76,7 +103,7 @@ export function removeToAdd(datum, data_stash) {
 
 export function deletePerson(datum, data_stash) {
   if (!checkIfRelativesConnectedWithoutPerson(datum, data_stash)) {
-    return { success: false, error: "checkIfRelativesConnectedWithoutPerson" };
+    return { success: false, error: 'checkIfRelativesConnectedWithoutPerson' };
   }
   executeDelete();
   return { success: true };
@@ -106,7 +133,7 @@ export function deletePerson(datum, data_stash) {
   }
 }
 
-export function cleanupDataJson(data_json) {
+export function cleanupDataJson(data_json: any) {
   let data_no_to_add = JSON.parse(data_json);
   data_no_to_add.forEach(d => d.to_add ? removeToAdd(d, data_no_to_add) : d);
   data_no_to_add.forEach(d => delete d.main);

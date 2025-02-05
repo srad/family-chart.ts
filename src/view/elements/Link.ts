@@ -1,4 +1,4 @@
-import d3 from "../../d3";
+import { line as d3line, curveMonotoneY, curveBasis } from 'd3';
 
 export default function Link({ d, entering, exiting }) {
   const path = createPath(d, entering, exiting);
@@ -10,9 +10,10 @@ export default function Link({ d, entering, exiting }) {
   };
 }
 
-export function createPath(d, is_) {
-  const line = d3.line().curve(d3.curveMonotoneY),
-    lineCurve = d3.line().curve(d3.curveBasis),
+// TODO: exiting was missing
+export function createPath(d, is_, exiting = false) {
+  const line = d3line().curve(curveMonotoneY),
+    lineCurve = d3line().curve(curveBasis),
     path_data = is_ ? d._d() : d.d;
 
   if (!d.curve) {

@@ -17,10 +17,10 @@ export default function setupCardSvgDefs(svg, card_dim) {
       </defs>
     `));
 
-  function curvedRectPath(dim, curve, no_curve_corners) {
+  function curvedRectPath(dim, curve, no_curve_corners = []) {
     const { w, h } = dim,
       c = curve,
-      ncc = no_curve_corners || [],
+      ncc = no_curve_corners,
       ncc_check = (corner) => ncc.includes(corner),
       lx = ncc_check("lx") ? `M0,0` : `M0,${c} Q 0,0 5,0`,
       rx = ncc_check("rx") ? `H${w}` : `H${w - c} Q ${w},0 ${w},5`,

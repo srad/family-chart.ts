@@ -1,18 +1,22 @@
-export function sortChildrenWithSpouses(data) {
+import { Gender, Person, Spouse, TreeInfo } from './CalculateTree';
+import { DatumType } from '../Cards/CardBase';
+
+export function sortChildrenWithSpouses(data: Person[]) {
   data.forEach(datum => {
     if (!datum.rels.children) {
       return;
     }
-    const spouses = datum.rels.spouses || [];
+    const spouses: string[] = (datum.rels.spouses || []) as string[];
+
     datum.rels.children.sort((a, b) => {
       const a_d = data.find(d => d.id === a),
         b_d = data.find(d => d.id === b),
-        a_p2 = otherParent(a_d, datum, data) || {},
-        b_p2 = otherParent(b_d, datum, data) || {},
+        a_p2 = otherParent(a_d, datum, data) || {} as Person,
+        b_p2 = otherParent(b_d, datum, data) || {} as Person,
         a_i = spouses.indexOf(a_p2.id),
         b_i = spouses.indexOf(b_p2.id);
 
-      if (datum.data.gender === "M") {
+      if (datum.data.gender === Gender.M) {
         return a_i - b_i;
       } else {
         return b_i - a_i;
@@ -21,7 +25,7 @@ export function sortChildrenWithSpouses(data) {
   });
 }
 
-function otherParent(d, p1, data) {
+function otherParent(d: Person, p1: Person, data: Person[]): Person {
   return data.find(d0 => (d0.id !== p1.id) && ((d0.id === d.rels.mother) || (d0.id === d.rels.father)));
 }
 
@@ -42,24 +46,32 @@ export function calculateEnterAndExitPositions(d, entering, exiting) {
       d._y = d.psy;
     }
   } else if (exiting) {
-    const x = d.x > 0 ? 1 : -1,
-      y = d.y > 0 ? 1 : -1;
-    {
-      d._x = d.x + 400 * x;
-      d._y = d.y + 400 * y;
-    }
+    const x = d.x > 0 ? 1 : -1;
+    const y = d.y > 0 ? 1 : -1;
+
+    d._x = d.x + 400 * x;
+    d._y = d.y + 400 * y;
   }
 }
 
-export function toggleRels(tree_datum, hide_rels) {
+export type TreeDatum = {
+  is_ancestry: any;
+  data: DatumType;
+  spouse: Spouse;
+  spouses: Spouse[];
+};
+
+export function toggleRels(tree_datum: TreeDatum, hide_rels) {
   const
-    rels = hide_rels ? "rels" : "_rels",
-    rels_ = hide_rels ? "_rels" : "rels";
+    rels = hide_rels ? 'rels' : '_rels',
+    rels_ = hide_rels ? '_rels' : 'rels';
 
   if (tree_datum.is_ancestry || tree_datum.data.main) {
-    showHideAncestry("father");
-    showHideAncestry("mother");
-  } else {showHideChildren();}
+    showHideAncestry('father');
+    showHideAncestry('mother');
+  } else {
+    showHideChildren();
+  }
 
   function showHideAncestry(rel_type) {
     if (!tree_datum.data[rels] || !tree_datum.data[rels][rel_type]) {
@@ -78,9 +90,9 @@ export function toggleRels(tree_datum, hide_rels) {
     }
     const
       children = tree_datum.data[rels].children.slice(0),
-      spouses = tree_datum.spouse ? [ tree_datum.spouse ] : tree_datum.spouses || [];
+      spouses = tree_datum.spouse ? [tree_datum.spouse] : tree_datum.spouses || [];
 
-    [ tree_datum, ...spouses ].forEach(sp => children.forEach(ch_id => {
+    [tree_datum, ...spouses].forEach(sp => children.forEach(ch_id => {
       if (sp.data[rels].children.includes(ch_id)) {
         if (!sp.data[rels_]) {
           sp.data[rels_] = {};

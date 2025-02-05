@@ -1,7 +1,8 @@
-import * as icons from "../view/elements/Card.icons";
+import * as icons from '../view/elements/Card.icons';
+import { Form } from './form';
 
-export function formInfoSetup(form_creator, closeCallback) {
-  const formContainer = document.createElement("div");
+export function formInfoSetup(form_creator: Form, closeCallback: () => void) {
+  const formContainer = document.createElement('div');
   update();
   return formContainer;
 
@@ -16,25 +17,25 @@ export function formInfoSetup(form_creator, closeCallback) {
   }
 
   function setupEventListeners() {
-    const form = formContainer.querySelector("form");
-    form.addEventListener("submit", form_creator.onSubmit);
+    const form = formContainer.querySelector('form');
+    form.addEventListener('submit', form_creator.onSubmit);
 
-    const cancel_btn = form.querySelector(".f3-cancel-btn");
-    cancel_btn.addEventListener("click", onCancel);
+    const cancel_btn: HTMLElement = form.querySelector('.f3-cancel-btn');
+    cancel_btn.addEventListener('click', onCancel);
 
-    const edit_btn = form.querySelector(".f3-edit-btn");
+    const edit_btn = form.querySelector('.f3-edit-btn');
     if (edit_btn) {
-      edit_btn.addEventListener("click", onEdit);
+      edit_btn.addEventListener('click', onEdit);
     }
 
-    const delete_btn = form.querySelector(".f3-delete-btn");
+    const delete_btn = form.querySelector('.f3-delete-btn');
     if (delete_btn && form_creator.onDelete) {
-      delete_btn.addEventListener("click", form_creator.onDelete);
+      delete_btn.addEventListener('click', form_creator.onDelete);
     }
 
-    const add_relative_btn = form.querySelector(".f3-add-relative-btn");
+    const add_relative_btn = form.querySelector('.f3-add-relative-btn');
     if (add_relative_btn && form_creator.addRelative) {
-      add_relative_btn.addEventListener("click", () => {
+      add_relative_btn.addEventListener('click', () => {
         if (form_creator.addRelativeActive) {
           form_creator.addRelativeCancel();
         } else {
@@ -45,11 +46,11 @@ export function formInfoSetup(form_creator, closeCallback) {
       });
     }
 
-    const close_btn = form.querySelector(".f3-close-btn");
-    close_btn.addEventListener("click", closeCallback);
+    const close_btn = form.querySelector('.f3-close-btn');
+    close_btn.addEventListener('click', closeCallback);
 
     if (form_creator.other_parent_field) {
-      cancel_btn.style.display = "none";
+      cancel_btn.style.display = 'none';
     }
 
     function onCancel() {
@@ -69,20 +70,20 @@ export function formInfoSetup(form_creator, closeCallback) {
 
 function getHtml(form_creator) {
   return (` 
-    <form id="familyForm" class="f3-form ${form_creator.editable ? "" : "non-editable"}">
+    <form id="familyForm" class="f3-form ${form_creator.editable ? '' : 'non-editable'}">
       ${closeBtn()}
-      ${form_creator.title ? `<h3 class="f3-form-title">${form_creator.title}</h3>` : ""}
-      <div style="text-align: right; display: ${form_creator.new_rel ? "none" : "block"}">
-        ${form_creator.addRelative && !form_creator.no_edit ? addRelativeBtn() : ""}
+      ${form_creator.title ? `<h3 class="f3-form-title">${form_creator.title}</h3>` : ''}
+      <div style="text-align: right; display: ${form_creator.new_rel ? 'none' : 'block'}">
+        ${form_creator.addRelative && !form_creator.no_edit ? addRelativeBtn() : ''}
         ${form_creator.no_edit ? spaceDiv() : editBtn()}
       </div>
       ${genderRadio()}
 
       ${fields()}
 
-      ${form_creator.other_parent_field ? otherParentField() : ""}
+      ${form_creator.other_parent_field ? otherParentField() : ''}
 
-      ${form_creator.onDelete ? deleteBtn() : ""}
+      ${form_creator.onDelete ? deleteBtn() : ''}
       
       <div class="f3-form-buttons">
         <button type="button" class="f3-cancel-btn">Cancel</button>
@@ -94,7 +95,7 @@ function getHtml(form_creator) {
   function deleteBtn() {
     return (`
       <div>
-        <button type="button" class="f3-delete-btn" ${form_creator.can_delete ? "" : "disabled"}>
+        <button type="button" class="f3-delete-btn" ${form_creator.can_delete ? '' : 'disabled'}>
           Delete
         </button>
       </div>
@@ -119,7 +120,7 @@ function getHtml(form_creator) {
 
   function genderRadio() {
     if (!form_creator.editable) {
-      return "";
+      return '';
     }
     return (`
       <div class="f3-radio-group">
@@ -127,11 +128,11 @@ function getHtml(form_creator) {
           <label>
             <input type="radio" name="${form_creator.gender_field.id}" 
               value="${option.value}" 
-              ${option.value === form_creator.gender_field.initial_value ? "checked" : ""}
+              ${option.value === form_creator.gender_field.initial_value ? 'checked' : ''}
             >
             ${option.label}
           </label>
-        `)).join("")}
+        `)).join('')}
       </div>
     `);
   }
@@ -141,30 +142,30 @@ function getHtml(form_creator) {
       return infoField();
     }
     return form_creator.fields.map(field => (`
-      ${field.type === "text" ? `
+      ${field.type === 'text' ? `
         <div class="f3-form-field">
           <label>${field.label}</label>
           <input type="${field.type}" 
             name="${field.id}" 
-            value="${field.initial_value || ""}"
+            value="${field.initial_value || ''}"
             placeholder="${field.label}">
         </div>
-      ` : field.type === "textarea" ? `
+      ` : field.type === 'textarea' ? `
         <div class="f3-form-field">
           <label>${field.label}</label>
           <textarea name="${field.id}" 
-            placeholder="${field.label}">${field.initial_value || ""}</textarea>
+            placeholder="${field.label}">${field.initial_value || ''}</textarea>
         </div>
-      ` : ""}
-    `)).join("");
+      ` : ''}
+    `)).join('');
 
     function infoField() {
       return form_creator.fields.map(field => (`
         <div class="f3-info-field">
           <span class="f3-info-field-label">${field.label}</span>
-          <span class="f3-info-field-value">${field.initial_value || ""}</span>
+          <span class="f3-info-field-value">${field.initial_value || ''}</span>
         </div>
-      `)).join("");
+      `)).join('');
     }
   }
 
@@ -175,10 +176,10 @@ function getHtml(form_creator) {
         <select name="${form_creator.other_parent_field.id}">
           ${form_creator.other_parent_field.options.map(option => `
             <option value="${option.value}" 
-              ${option.value === form_creator.other_parent_field.initial_value ? "selected" : ""}>
+              ${option.value === form_creator.other_parent_field.initial_value ? 'selected' : ''}>
               ${option.label}
             </option>
-          `).join("")}
+          `).join('')}
         </select>
       </div>
     `);

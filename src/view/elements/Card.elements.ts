@@ -1,6 +1,8 @@
-import d3 from "../../d3";
-import { cardChangeMain, cardEdit, cardShowHideRels } from "../../handlers/cardMethods";
-import { CardBody, CardBodyAddNew, CardImage, LinkBreakIconWrapper, MiniTree, PencilIcon, PlusIcon } from "./Card.templates";
+import { cardChangeMain, cardEdit, cardShowHideRels } from '../../handlers/cardMethods';
+import { CardBody, CardBodyAddNew, CardImage, LinkBreakIconWrapper, MiniTree, PencilIcon, PlusIcon } from './Card.templates';
+import { create } from 'd3';
+import { CardBase, CardDim } from '../../Cards/CardBase';
+import { CardHtml } from '../../Cards/CardHtml';
 
 const CardElements = {
   miniTree,
@@ -20,8 +22,8 @@ function miniTree(d, props) {
   if (d.all_rels_displayed) {
     return;
   }
-  const g = d3.create("svg:g").html(MiniTree({ d, card_dim }).template);
-  g.on("click", function (e) {
+  const g = create('svg:g').html(MiniTree({ d, card_dim }).template);
+  g.on('click', function (e) {
     e.stopPropagation();
     if (props.onMiniTreeClick) {
       props.onMiniTreeClick.call(this, e, d);
@@ -37,8 +39,8 @@ function lineBreak(d, props) {
     return;
   }
   const card_dim = props.card_dim;
-  const g = d3.create("svg:g").html(LinkBreakIconWrapper({ d, card_dim }).template);
-  g.on("click", (e) => {
+  const g = create('svg:g').html(LinkBreakIconWrapper({ d, card_dim }).template);
+  g.on('click', (e) => {
     e.stopPropagation();
     cardShowHideRels(props.store, { d });
   });
@@ -46,13 +48,13 @@ function lineBreak(d, props) {
 }
 
 function cardBody(d, props) {
-  const unknown_lbl = props.cardEditForm ? "ADD" : "UNKNOWN";
+  const unknown_lbl = props.cardEditForm ? 'ADD' : 'UNKNOWN';
   const card_dim = props.card_dim;
 
   let g;
   if (!d.data.to_add) {
-    g = d3.create("svg:g").html(CardBody({ d, card_dim, card_display: props.card_display }).template);
-    g.on("click", function (e) {
+    g = create('svg:g').html(CardBody({ d, card_dim, card_display: props.card_display }).template);
+    g.on('click', function (e) {
       e.stopPropagation();
       if (props.onCardClick) {
         props.onCardClick.call(this, e, d);
@@ -61,8 +63,8 @@ function cardBody(d, props) {
       }
     });
   } else {
-    g = d3.create("svg:g").html(CardBodyAddNew({ d, card_dim, card_add: props.cardEditForm, label: unknown_lbl }).template);
-    g.on("click", (e) => {
+    g = create('svg:g').html(CardBodyAddNew({ d, card_dim, card_add: props.cardEditForm, label: unknown_lbl }).template);
+    g.on('click', (e) => {
       e.stopPropagation();
       cardEdit(props.store, { d, cardEditForm: props.cardEditForm });
     });
@@ -75,7 +77,7 @@ function cardImage(d, props) {
     return;
   }
   const card_dim = props.card_dim;
-  const g = d3.create("svg:g").html(CardImage({ d, image: d.data.data.avatar || null, card_dim, maleIcon: null, femaleIcon: null }).template);
+  const g = create('svg:g').html(CardImage({ d, image: d.data.data.avatar || null, card_dim, maleIcon: null, femaleIcon: null }).template);
   return g.node();
 }
 
@@ -84,8 +86,8 @@ function cardEditIcon(d, props) {
     return;
   }
   const card_dim = props.card_dim;
-  const g = d3.create("svg:g").html(PencilIcon({ card_dim, x: card_dim.w - 46, y: card_dim.h - 20 }).template);
-  g.on("click", (e) => {
+  const g = create('svg:g').html(PencilIcon({ card_dim, x: card_dim.w - 46, y: card_dim.h - 20 }).template);
+  g.on('click', (e) => {
     e.stopPropagation();
     cardEdit(props.store, { d, cardEditForm: props.cardEditForm });
   });
@@ -93,13 +95,13 @@ function cardEditIcon(d, props) {
   return g.node();
 }
 
-function cardAddIcon(d, props) {
+function cardAddIcon(d, props: CardHtml) {
   if (d.data.to_add) {
     return;
   }
-  const card_dim = props.card_dim;
-  const g = d3.create("svg:g").html(PlusIcon({ card_dim, x: card_dim.w - 26, y: card_dim.h - 20 }).template);
-  g.on("click", (e) => {
+  const card_dim = props.getDim();
+  const g = create('svg:g').html(PlusIcon({ card_dim, x: card_dim.w - 26, y: card_dim.h - 20 }).template);
+  g.on('click', (e) => {
     e.stopPropagation();
     props.addRelative({ d });
   });
@@ -107,7 +109,7 @@ function cardAddIcon(d, props) {
   return g.node();
 }
 
-export function appendElement(el_maybe, parent, is_first) {
+export function appendElement(el_maybe, parent, is_first = false) {
   if (!el_maybe) {
     return;
   }

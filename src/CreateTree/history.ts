@@ -1,7 +1,7 @@
-import d3 from "../d3";
-import { cleanupDataJson } from "./form";
-import * as icons from "../view/elements/Card.icons";
-import { DatumType, Store } from "../Cards/CardBase";
+import { cleanupDataJson } from './form';
+import * as icons from '../view/elements/Card.icons';
+import { DatumType, Store } from '../Cards/CardBase';
+import { select } from 'd3';
 
 export type History = {
   controls?: HistoryControls;
@@ -12,7 +12,7 @@ export type History = {
   canBack: () => boolean;
 };
 
-export function createHistory(store: Store, getStoreData: () => DatumType, onUpdate: () => void) {
+export function createHistory(store: Store<DatumType>, getStoreData: () => DatumType, onUpdate: () => void) {
   let history = [];
   let history_index = -1;
 
@@ -74,13 +74,13 @@ export type HistoryControls = {
 
 export function createHistoryControls(cont: HTMLElement, history: History, onUpdate = () => {
 }) {
-  const history_controls = d3.select(cont).append("div").attr("class", "f3-history-controls");
-  const back_btn = history_controls.append("button").attr("class", "f3-back-button").on("click", () => {
+  const history_controls = select(cont).append('div').attr('class', 'f3-history-controls');
+  const back_btn = history_controls.append('button').attr('class', 'f3-back-button').on('click', () => {
     history.back();
     updateButtons();
     onUpdate();
   });
-  const forward_btn = history_controls.append("button").attr("class", "f3-forward-button").on("click", () => {
+  const forward_btn = history_controls.append('button').attr('class', 'f3-forward-button').on('click', () => {
     history.forward();
     updateButtons();
     onUpdate();
@@ -97,13 +97,13 @@ export function createHistoryControls(cont: HTMLElement, history: History, onUpd
   };
 
   function updateButtons() {
-    back_btn.classed("disabled", !history.canBack());
-    forward_btn.classed("disabled", !history.canForward());
-    history_controls.style("display", !history.canBack() && !history.canForward() ? "none" : null);
+    back_btn.classed('disabled', !history.canBack());
+    forward_btn.classed('disabled', !history.canForward());
+    history_controls.style('display', !history.canBack() && !history.canForward() ? 'none' : null);
   }
 
   function destroy() {
     history = null;
-    d3.select(cont).select(".f3-history-controls").remove();
+    select(cont).select('.f3-history-controls').remove();
   }
 }

@@ -1,6 +1,6 @@
-import d3 from "../d3";
+import { create, zoom as d3zoom, select } from 'd3';
 
-export default function createSvg(cont, props = {}) {
+export default function createSvg(cont: HTMLElement, props = {}) {
   const svg_dim = cont.getBoundingClientRect();
   const svg_html = (`
     <svg class="main_svg">
@@ -21,9 +21,9 @@ export default function createSvg(cont, props = {}) {
 
   const f3Canvas = getOrCreateF3Canvas(cont);
 
-  const temp_div = d3.create("div").node();
+  const temp_div = create('div').node();
   temp_div.innerHTML = svg_html;
-  const svg = temp_div.querySelector("svg");
+  const svg = temp_div.querySelector('svg');
   f3Canvas.appendChild(svg);
 
   cont.appendChild(f3Canvas);
@@ -32,23 +32,23 @@ export default function createSvg(cont, props = {}) {
 
   return svg;
 
-  function getOrCreateF3Canvas(cont) {
-    let f3Canvas = cont.querySelector("#f3Canvas");
+  function getOrCreateF3Canvas(cont: HTMLElement) {
+    let f3Canvas = cont.querySelector('#f3Canvas');
     if (!f3Canvas) {
-      f3Canvas = d3.create("div").attr("id", "f3Canvas").attr("style", "position: relative; overflow: hidden; width: 100%; height: 100%;").node();
+      f3Canvas = create('div').attr('id', 'f3Canvas').attr('style', 'position: relative; overflow: hidden; width: 100%; height: 100%;').node();
     }
     return f3Canvas;
   }
 }
 
-function setupZoom(el, props = {}) {
+function setupZoom(el, props: { onZoom?: () => void, zoom_polite?: boolean } = {}) {
   if (el.__zoom) {
     return;
   }
-  const view = el.querySelector(".view"),
-    zoom = d3.zoom().on("zoom", (props.onZoom || zoomed));
+  const view = el.querySelector('.view'),
+    zoom = d3zoom().on('zoom', (props.onZoom || zoomed));
 
-  d3.select(el).call(zoom);
+  select(el).call(zoom);
   el.__zoomObj = zoom;
 
   if (props.zoom_polite) {
@@ -56,16 +56,14 @@ function setupZoom(el, props = {}) {
   }
 
   function zoomed(e) {
-    d3.select(view).attr("transform", e.transform);
+    select(view).attr('transform', e.transform);
   }
 
   function zoomFilter(e) {
-    if (e.type === "wheel" && !e.ctrlKey) {
-      return false;
-    } else if (e.touches && e.touches.length < 2) {
+    if (e.type === 'wheel' && !e.ctrlKey) {
       return false;
     } else {
-      return true;
+      return !(e.touches && e.touches.length < 2);
     }
   }
 }

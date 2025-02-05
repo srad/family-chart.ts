@@ -1,7 +1,9 @@
-import d3 from "../d3";
-import { sortChildrenWithSpouses } from "./CalculateTree.handlers";
-import { createNewPerson, RelType } from "../CreateTree/newPerson";
-import { isAllRelativeDisplayed } from "../handlers/general";
+import { sortChildrenWithSpouses } from './CalculateTree.handlers';
+import { createNewPerson, RelType } from '../CreateTree/newPerson';
+import { isAllRelativeDisplayed } from '../handlers/general';
+import { hierarchy as d3hierarchy, tree as d3tree, extent as d3extent } from 'd3';
+import type { TreeDim } from '../view/view.handlers.ts';
+import type { DatumType } from '../Cards/CardBase.ts';
 
 export type Spouse = {
   y: number;
@@ -14,9 +16,7 @@ export type Spouse = {
   added: boolean;
 };
 
-export enum Gender {
-  M, F, D
-}
+export enum Gender { M, F, D, }
 
 export type RelData = {
   rel_type: RelType;
@@ -24,27 +24,53 @@ export type RelData = {
   other_parent_id?: string;
 }
 
+export type Relatives = {
+  father?: string;
+  mother?: string;
+  spouses?: string[];
+  children: string[]
+};
+
+export type PersonData = {
+  gender: Gender;
+  firstName?: string;
+  lastName?: string;
+  birthDate?: string;
+  avatar?: string;
+  other_parent?: string;
+};
+
 export type Person = {
-  gender?: Gender,
-  id: string,
-  data: { gender: Gender },
+  id: string;
+  data: PersonData;
+  rels: Relatives;
+  gender?: Gender;
   to_add?: boolean;
-  rels: { spouse: Spouse[], children: any[] };
-  _new_rel_data?: RelData,
+  _new_rel_data?: RelData;
 }
 
-export default function CalculateTree({ data, main_id = null, node_separation = 250, level_separation = 150, single_parent_empty_card = true, is_horizontal = false }) {
+export type TreeInfo = {
+  dim: TreeDim;
+  data?: any[];
+  main_id: string | null;
+  node_separation: number;
+  level_separation: number;
+  single_parent_empty_card: boolean;
+  is_horizontal: boolean;
+};
+
+export default function CalculateTree({ data, main_id = null, node_separation = 250, level_separation = 150, single_parent_empty_card = true, is_horizontal = false }: TreeInfo) {
   if (!data || !data.length) {
     return { data: [], data_stash: [], dim: { width: 0, height: 0 }, main_id: null };
   }
   if (is_horizontal) {
-    [ node_separation, level_separation ] = [ level_separation, node_separation ];
+    [node_separation, level_separation] = [level_separation, node_separation];
   }
   const data_stash = single_parent_empty_card ? createRelsToAdd(data) : data;
   sortChildrenWithSpouses(data_stash);
   const main = (main_id !== null && data_stash.find(d => d.id === main_id)) || data_stash[0];
-  const tree_children = calculateTreePositions(main, "children", false);
-  const tree_parents = calculateTreePositions(main, "parents", true);
+  const tree_children = calculateTreePositions(main, 'children', false);
+  const tree_parents = calculateTreePositions(main, 'parents', true);
 
   data_stash.forEach(d => d.main = d === main);
   levelOutEachSide(tree_parents, tree_children);
@@ -59,14 +85,14 @@ export default function CalculateTree({ data, main_id = null, node_separation = 
 
   return { data: tree, data_stash, dim, main_id: main.id, is_horizontal };
 
-  function calculateTreePositions(datum, rt, is_ancestry) {
-    const hierarchyGetter = rt === "children" ? hierarchyGetterChildren : hierarchyGetterParents,
-      d3_tree = d3.tree().nodeSize([ node_separation, level_separation ]).separation(separation),
-      root = d3.hierarchy(datum, hierarchyGetter);
+  function calculateTreePositions(datum: DatumType, rt: string, is_ancestry: boolean) {
+    const hierarchyGetter = rt === 'children' ? hierarchyGetterChildren : hierarchyGetterParents,
+      d3_tree = d3tree().nodeSize([node_separation, level_separation]).separation(separation),
+      root = d3hierarchy(datum, hierarchyGetter);
     d3_tree(root);
     return root.descendants();
 
-    function separation(a, b) {
+    function separation(a: Element, b: Element) {
       let offset = 1;
       if (!is_ancestry) {
         if (!sameParent(a, b)) {
@@ -82,7 +108,7 @@ export default function CalculateTree({ data, main_id = null, node_separation = 
       return offset;
     }
 
-    function hasCh(d) {
+    function hasCh(d: Element): boolean {
       return !!d.children;
     }
 
@@ -94,7 +120,7 @@ export default function CalculateTree({ data, main_id = null, node_separation = 
       return (a.data.rels.father === b.data.rels.father) && (a.data.rels.mother === b.data.rels.mother);
     }
 
-    function someChildren(a, b) {
+    function someChildren(a: Element, b: Element): boolean {
       return hasCh(a) || hasCh(b);
     }
 
@@ -107,11 +133,11 @@ export default function CalculateTree({ data, main_id = null, node_separation = 
     }
 
     function hierarchyGetterChildren(d) {
-      return [ ...(d.rels.children || []) ].map(id => data_stash.find(d => d.id === id));
+      return [...(d.rels.children || [])].map(id => data_stash.find(d => d.id === id));
     }
 
     function hierarchyGetterParents(d) {
-      return [ d.rels.father, d.rels.mother ]
+      return [d.rels.father, d.rels.mother]
         .filter(d => d).map(id => data_stash.find(d => d.id === id));
     }
 
@@ -132,7 +158,7 @@ export default function CalculateTree({ data, main_id = null, node_separation = 
     });
     parents.forEach(d => d.depth === 1 ? d.parent = children[0] : null);
 
-    return [ ...children, ...parents.slice(1) ];
+    return [...children, ...parents.slice(1)];
   }
 
   function nodePositioning({ tree }) {
@@ -150,7 +176,7 @@ export default function CalculateTree({ data, main_id = null, node_separation = 
     for (let i = tree.length; i--;) {
       const d = tree[i];
       if (!d.is_ancestry && d.data.rels.spouses && d.data.rels.spouses.length > 0) {
-        const side = d.data.data.gender === "M" ? -1 : 1;  // female on right
+        const side = d.data.data.gender === 'M' ? -1 : 1;  // female on right
         d.x += d.data.rels.spouses.length / 2 * node_separation * side;
         d.data.rels.spouses.forEach((sp_id, i) => {
           const spouse: Spouse = {
@@ -195,7 +221,7 @@ export default function CalculateTree({ data, main_id = null, node_separation = 
       const f = findDatum(d.data.rels.father);
       if (m && f) {
         if (!m.added && !f.added) {
-          console.error("no added spouse", m, f);
+          console.error('no added spouse', m, f);
         }
         const added_spouse = m.added ? m : f;
         setupParentPos(d, added_spouse);
@@ -241,14 +267,18 @@ export default function CalculateTree({ data, main_id = null, node_separation = 
     });
   }
 
-  function calculateTreeDim(tree, node_separation, level_separation) {
+  function calculateTreeDim(tree: { x: number, y: number }[], node_separation: number, level_separation: number) {
     if (is_horizontal) {
-      [ node_separation, level_separation ] = [ level_separation, node_separation ];
+      [node_separation, level_separation] = [level_separation, node_separation];
     }
-    const w_extent = d3.extent(tree, d => d.x);
-    const h_extent = d3.extent(tree, d => d.y);
+    const w_extent = +d3extent(tree, d => d.x);
+    const h_extent = +d3extent(tree, d => d.y);
+
     return {
-      width: w_extent[1] - w_extent[0] + node_separation, height: h_extent[1] - h_extent[0] + level_separation, x_off: -w_extent[0] + node_separation / 2, y_off: -h_extent[0] + level_separation / 2
+      width: w_extent[1] - w_extent[0] + node_separation,
+      height: h_extent[1] - h_extent[0] + level_separation,
+      x_off: -w_extent[0] + node_separation / 2,
+      y_off: -h_extent[0] + level_separation / 2
     };
   }
 
@@ -260,15 +290,15 @@ export default function CalculateTree({ data, main_id = null, node_separation = 
         if (!d.rels.spouses) {
           d.rels.spouses = [];
         }
-        const is_father = d.data.gender === "M";
+        const is_father = d.data.gender === 'M';
         let spouse;
 
         d.rels.children.forEach(d0 => {
           const child = data.find(d1 => d1.id === d0);
-          if (child.rels[is_father ? "father" : "mother"] !== d.id) {
+          if (child.rels[is_father ? 'father' : 'mother'] !== d.id) {
             return;
           }
-          if (child.rels[!is_father ? "father" : "mother"]) {
+          if (child.rels[!is_father ? 'father' : 'mother']) {
             return;
           }
           if (!spouse) {
@@ -276,17 +306,17 @@ export default function CalculateTree({ data, main_id = null, node_separation = 
             d.rels.spouses.push(spouse.id);
           }
           spouse.rels.children.push(child.id);
-          child.rels[!is_father ? "father" : "mother"] = spouse.id;
+          child.rels[!is_father ? 'father' : 'mother'] = spouse.id;
         });
       }
     }
     to_add_spouses.forEach(d => data.push(d));
     return data;
 
-    function createToAddSpouse(d): Person {
+    function createToAddSpouse(d: Person): Person {
       const spouse: Person = createNewPerson({
-        data: { gender: d.data.gender === "M" ? "F" : "M" },
-        rels: { spouses: [ d.id ], children: [] },
+        data: { gender: d.data.gender === Gender.M ? Gender.F : Gender.M },
+        rels: { spouses: [d.id], children: [] },
       });
       spouse.to_add = true;
       to_add_spouses.push(spouse);
