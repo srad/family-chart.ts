@@ -1,4 +1,4 @@
-import { zoomIdentity, select } from 'd3';
+import { select, zoomIdentity } from "d3";
 
 export class SvgNode extends Element {
   public __zoomObj: any; // TODO: Is this some d3 super duper object?
@@ -20,7 +20,7 @@ function positionTree({ t, svg, transition_time = 2000 }: { t: { x: number; y: n
 
 export type TreeFitOptions = {
   svg: SvgNode;
-  svg_dim: DOMRect;
+  svg_dim: SvgDim;
   tree_dim: TreeDim;
   with_transition?: boolean;
   transition_time: number;

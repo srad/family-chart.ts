@@ -1,6 +1,6 @@
-import type { Person } from '../CalculateTree/CalculateTree.ts';
-import { select } from 'd3';
-import type { SvgNode } from '../view/view.handlers.ts';
+import type { Person } from "../CalculateTree/CalculateTree.ts";
+import { select } from "d3";
+import type { SvgNode } from "../view/view.handlers.ts";
 
 export function manualZoom({ amount, svg, transition_time = 500 }: { amount: number; svg: SvgNode, transition_time: number }) {
   const zoom = svg.__zoomObj;
@@ -10,6 +10,6 @@ export function manualZoom({ amount, svg, transition_time = 500 }: { amount: num
 
 export function isAllRelativeDisplayed(d: Person, data: Person[]) {
   const r = d.data.rels,
-    all_rels = [r.father, r.mother, ...(r.spouses || []), ...(r.children || [])].filter(v => v);
+    all_rels = [ r.father, r.mother, ...(r.spouses || []), ...(r.children || []) ].filter(v => v);
   return all_rels.every(rel_id => data.some(d => d.data.id === rel_id));
 }

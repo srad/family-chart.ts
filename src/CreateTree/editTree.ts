@@ -1,9 +1,10 @@
-import { select } from 'd3';
-import addRelative, { AddRelative } from './addRelative';
-import { cleanupDataJson, createForm, deletePerson } from './form';
-import { DatumType, Store } from '../Cards/CardBase';
-import { createHistory, createHistoryControls, History } from './history';
-import { formInfoSetup } from './formInfoSetup';
+import { select } from "d3";
+import addRelative, { AddRelative } from "./addRelative";
+import { cleanupDataJson, createForm, deletePerson } from "./form";
+import { DatumType, Store } from "../Cards/CardBase";
+import { createHistory, createHistoryControls, History } from "./history";
+import { formInfoSetup } from "./formInfoSetup";
+import { Person } from "../CalculateTree/CalculateTree";
 
 export default function (cont: HTMLElement, store: Store<DatumType>) {
   return new EditTree(cont, store);
@@ -26,10 +27,10 @@ export class EditTree {
     this.store = store;
 
     this.fields = [
-      { type: 'text', label: 'first name', id: 'first name' },
-      { type: 'text', label: 'last name', id: 'last name' },
-      { type: 'text', label: 'birthday', id: 'birthday' },
-      { type: 'text', label: 'avatar', id: 'avatar' }
+      { type: "text", label: "first name", id: "first name" },
+      { type: "text", label: "last name", id: "last name" },
+      { type: "text", label: "birthday", id: "birthday" },
+      { type: "text", label: "avatar", id: "avatar" }
     ];
 
     this.form_cont = null;
@@ -47,54 +48,56 @@ export class EditTree {
   }
 
   init() {
-    this.form_cont = select(this.cont).append('div').classed('f3-form-cont', true).node();
+    this.form_cont = select(this.cont).append("div").classed("f3-form-cont", true).node();
     this.addRelativeInstance = this.setupAddRelative();
     this.createHistory();
   }
 
-  open(datum: DatumType) {
-    if (datum.data.data) {
-      datum = datum.data;
-    }
+  open(datum: Person) {
+    // TODO: What is going on there?
+    //if (datum.data.data) {
+    //  datum = datum.data;
+    //}
     if (this.addRelativeInstance.is_active && !datum._new_rel_data) {
       this.addRelativeInstance.onCancel();
       datum = this.store.getDatum(datum.id);
     }
 
-    this.cardEditForm({ data: datum });
+    this.cardEditForm(datum);
   }
 
-  openWithoutRelCancel(datum: { data: DatumType }) {
-    if (datum.data.data) {
-      datum = datum.data;
-    }
+  openWithoutRelCancel(datum: Person) {
+    // TODO: What is going on there?
+    //if (datum.data.data) {
+    //  datum = datum.data;
+    //}
 
     this.cardEditForm(datum);
   }
 
-  cardEditForm(datum: { data: DatumType, _new_rel_data?: DatumType }) {
+  cardEditForm(datum: Person) {
     const props: { onCancel?: () => void, addRelative?: AddRelative<DatumType>, deletePerson?: () => void } = {};
     const is_new_rel = datum?._new_rel_data;
     if (is_new_rel) {
       props.onCancel = () => this.addRelativeInstance.onCancel();
     } else {
       props.addRelative = this.addRelativeInstance;
-      props.deletePerson = () => {
+      props.deletePerson = (): void => {
         const data = this.store.getData();
         deletePerson(datum, data);
         this.store.updateData(data);
         this.openFormWithId(this.store.getLastAvailableMainDatum().id);
-
         this.store.updateTree({});
       };
     }
 
     const form_creator = createForm({
+      deletePerson,
       store: this.store,
       datum,
       postSubmit: postSubmit.bind(this),
       fields: this.fields,
-      card_display: this.card_display,
+      //card_display: this.card_display,
       addRelative: null,
       onCancel: () => {
       },
@@ -105,7 +108,7 @@ export class EditTree {
     form_creator.no_edit = this.no_edit;
     const form_cont = formInfoSetup(form_creator, this.closeForm.bind(this));
 
-    this.form_cont.innerHTML = '';
+    this.form_cont.innerHTML = "";
     this.form_cont.appendChild(form_cont);
 
     this.openForm();
@@ -114,7 +117,7 @@ export class EditTree {
       if (this.addRelativeInstance.is_active) {
         this.addRelativeInstance.onChange(datum);
       } else if (!props?.delete) {
-        this.openFormWithId(datum.data.id);
+        this.openFormWithId(datum.id);
       }
 
       if (!this.is_fixed) {
@@ -128,24 +131,24 @@ export class EditTree {
   }
 
   openForm() {
-    select(this.form_cont).classed('opened', true);
+    select(this.form_cont).classed("opened", true);
   }
 
   closeForm() {
-    select(this.form_cont).classed('opened', false).html('');
+    select(this.form_cont).classed("opened", false).html("");
     this.store.updateTree({});
   };
 
   fixed() {
     this.is_fixed = true;
-    select(this.form_cont).style('position', 'relative');
+    select(this.form_cont).style("position", "relative");
 
     return this;
   }
 
   absolute() {
     this.is_fixed = false;
-    select(this.form_cont).style('position', 'absolute');
+    select(this.form_cont).style("position", "absolute");
 
     return this;
   }
@@ -164,15 +167,15 @@ export class EditTree {
     return this;
   }
 
-  openFormWithId(d_id) {
+  openFormWithId(d_id: string) {
     if (d_id) {
       const d = this.store.getDatum(d_id);
-      this.openWithoutRelCancel({ data: d });
+      this.openWithoutRelCancel(d);
     } else {
       const d = this.store.getMainDatum();
-      this.openWithoutRelCancel({ data: d });
+      this.openWithoutRelCancel(d);
     }
-  };
+  }
 
   createHistory() {
     this.history = createHistory(this.store, this.getStoreData.bind(this), historyUpdateTree.bind(this));
@@ -207,20 +210,20 @@ export class EditTree {
   setFields(fields) {
     const new_fields = [];
     if (!Array.isArray(fields)) {
-      console.error('fields must be an array');
+      console.error("fields must be an array");
       return this;
     }
     for (const field of fields) {
-      if (typeof field === 'string') {
-        new_fields.push({ type: 'text', label: field, id: field });
-      } else if (typeof field === 'object') {
+      if (typeof field === "string") {
+        new_fields.push({ type: "text", label: field, id: field });
+      } else if (typeof field === "object") {
         if (!field.id) {
-          console.error('fields must be an array of objects with id property');
+          console.error("fields must be an array of objects with id property");
         } else {
           new_fields.push(field);
         }
       } else {
-        console.error('fields must be an array of strings or objects');
+        console.error("fields must be an array of strings or objects");
       }
     }
     this.fields = new_fields;
@@ -298,7 +301,7 @@ export class EditTree {
   destroy() {
     this.history.controls.destroy();
     this.history = null;
-    select(this.cont).select('.f3-form-cont').remove();
+    select(this.cont).select(".f3-form-cont").remove();
     if (this.addRelativeInstance.onCancel) {
       this.addRelativeInstance.onCancel();
     }

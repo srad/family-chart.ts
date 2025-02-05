@@ -1,5 +1,7 @@
 import { toggleAllRels, toggleRels } from "../CalculateTree/CalculateTree.handlers";
 import { deletePerson, moveToAddToAdded } from "../CreateTree/form";
+import { Person } from "../CalculateTree/CalculateTree";
+import { Store } from "../Cards/CardBase";
 
 export function cardChangeMain(store, { d }) {
   toggleAllRels(store.getTree().data, false);
@@ -8,7 +10,7 @@ export function cardChangeMain(store, { d }) {
   return true;
 }
 
-export function cardEdit(store, { d, cardEditForm }) {
+export function cardEdit(store: Store<any>, { d, cardEditForm }: { d: { data: Person }, cardEditForm: (form: { datum: Person, postSubmit: (props: any) => void, store: Store<any> }) => void }) {
   const datum = d.data,
     postSubmit = (props) => {
       if (datum.to_add) {
@@ -20,7 +22,7 @@ export function cardEdit(store, { d, cardEditForm }) {
         }
         deletePerson(datum, store.getData());
       }
-      store.updateTree();
+      store.updateTree({});
     };
   cardEditForm({ datum, postSubmit, store });
 }

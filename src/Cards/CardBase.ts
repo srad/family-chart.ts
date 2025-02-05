@@ -1,4 +1,5 @@
 ﻿import type { SvgNode } from '../view/view.handlers.ts';
+import { Person } from "../CalculateTree/CalculateTree";
 
 export type DatumType = {
   main: boolean;
@@ -13,11 +14,11 @@ export type Store<T> = {
   updateMainId(id: string): void;
   updateTree(param: {}): void;
   getTreeMainDatum(): string;
-  getDatum(id: string): DatumType;
+  getDatum(id: string): Person;
   getLastAvailableMainDatum(): DatumType;
-  updateData(data: DatumType): void;
-  getData(): DatumType;
-  getMainDatum(): DatumType;
+  updateData(data: Person[] | Person): void;
+  getData(): Person[];
+  getMainDatum(): Person;
   getMainId(): string;
 };
 

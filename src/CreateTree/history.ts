@@ -1,7 +1,8 @@
-import { cleanupDataJson } from './form';
-import * as icons from '../view/elements/Card.icons';
-import { DatumType, Store } from '../Cards/CardBase';
-import { select } from 'd3';
+import { cleanupDataJson } from "./form";
+import * as icons from "../view/elements/Card.icons";
+import { DatumType, Store } from "../Cards/CardBase";
+import { select } from "d3";
+import { Person } from "../CalculateTree/CalculateTree";
 
 export type History = {
   controls?: HistoryControls;
@@ -58,7 +59,7 @@ export function createHistory(store: Store<DatumType>, getStoreData: () => Datum
     return history_index > 0;
   }
 
-  function updateData(data: DatumType) {
+  function updateData(data: Person) {
     store.updateMainId(data.main_id);
     store.updateData(data);
     onUpdate();
@@ -72,18 +73,21 @@ export type HistoryControls = {
   destroy: () => void;
 };
 
-export function createHistoryControls(cont: HTMLElement, history: History, onUpdate = () => {
-}) {
-  const history_controls = select(cont).append('div').attr('class', 'f3-history-controls');
-  const back_btn = history_controls.append('button').attr('class', 'f3-back-button').on('click', () => {
+export function createHistoryControls(cont: HTMLElement, history: History, onUpdate?: () => void) {
+  const history_controls = select(cont).append("div").attr("class", "f3-history-controls");
+  const back_btn = history_controls.append("button").attr("class", "f3-back-button").on("click", () => {
     history.back();
     updateButtons();
-    onUpdate();
+    if (onUpdate) {
+      onUpdate();
+    }
   });
-  const forward_btn = history_controls.append('button').attr('class', 'f3-forward-button').on('click', () => {
+  const forward_btn = history_controls.append("button").attr("class", "f3-forward-button").on("click", () => {
     history.forward();
     updateButtons();
-    onUpdate();
+    if (onUpdate) {
+      onUpdate();
+    }
   });
 
   back_btn.html(icons.historyBackSvgIcon());
@@ -97,13 +101,13 @@ export function createHistoryControls(cont: HTMLElement, history: History, onUpd
   };
 
   function updateButtons() {
-    back_btn.classed('disabled', !history.canBack());
-    forward_btn.classed('disabled', !history.canForward());
-    history_controls.style('display', !history.canBack() && !history.canForward() ? 'none' : null);
+    back_btn.classed("disabled", !history.canBack());
+    forward_btn.classed("disabled", !history.canForward());
+    history_controls.style("display", !history.canBack() && !history.canForward() ? "none" : null);
   }
 
   function destroy() {
     history = null;
-    select(cont).select('.f3-history-controls').remove();
+    select(cont).select(".f3-history-controls").remove();
   }
 }

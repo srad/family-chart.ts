@@ -1,6 +1,6 @@
-import { createNewPerson, handleNewRel, RelType } from './newPerson';
-import { Store } from '../Cards/CardBase';
-import { Gender } from '../CalculateTree/CalculateTree';
+import { createNewPerson, handleNewRel, RelType } from "./newPerson";
+import { Store } from "../Cards/CardBase";
+import { Gender } from "../CalculateTree/CalculateTree";
 
 export default <T>(store: Store<T>, cancelCallback?: () => void, onSubmitCallback?: () => void) => {
   return new AddRelative(store, cancelCallback, onSubmitCallback);
@@ -69,7 +69,7 @@ export class AddRelative<T> {
       } else if (updated_datum.id === this.datum.id) {
         this.datum.data = updated_datum.data;  // if in meanwhile the user changed the data for main datum, we need to keep it
       } else {
-        console.error('Something went wrong');
+        console.error("Something went wrong");
       }
     }
 
@@ -91,8 +91,8 @@ export class AddRelative<T> {
   }
 
   setAddRelLabels(add_rel_labels) {
-    if (typeof add_rel_labels !== 'object') {
-      console.error('add_rel_labels must be an object');
+    if (typeof add_rel_labels !== "object") {
+      console.error("add_rel_labels must be an object");
       return;
     }
     for (let key in add_rel_labels) {
@@ -103,11 +103,11 @@ export class AddRelative<T> {
 
   addRelLabelsDefault(): RelDefaults {
     return {
-      father: 'Add Father',
-      mother: 'Add Mother',
-      spouse: 'Add Spouse',
-      son: 'Add Son',
-      daughter: 'Add Daughter'
+      father: "Add Father",
+      mother: "Add Mother",
+      spouse: "Add Spouse",
+      son: "Add Son",
+      daughter: "Add Daughter"
     };
   }
 
@@ -120,24 +120,24 @@ function getDatumRelsData(datum, store_data, addRelLabels) {
   const datum_rels = getDatumRels(datum, store_data);
 
   if (!datum.rels.father) {
-    const father = createNewPerson({ data: { gender: Gender.M }, rels: { children: [datum.id] } });
+    const father = createNewPerson({ data: { gender: Gender.M }, rels: { children: [ datum.id ] } });
     father._new_rel_data = { rel_type: RelType.Father, label: addRelLabels.father };
     datum.rels.father = father.id;
     datum_rels.push(father);
   }
   if (!datum.rels.mother) {
-    const mother = createNewPerson({ data: { gender: Gender.F }, rels: { children: [datum.id] } });
+    const mother = createNewPerson({ data: { gender: Gender.F }, rels: { children: [ datum.id ] } });
     mother._new_rel_data = { rel_type: RelType.Mother, label: addRelLabels.mother };
     datum.rels.mother = mother.id;
     datum_rels.push(mother);
   }
   const mother = datum_rels.find(d => d.id === datum.rels.mother);
   const father = datum_rels.find(d => d.id === datum.rels.father);
-  mother.rels.spouses = [father.id];
-  father.rels.spouses = [mother.id];
+  mother.rels.spouses = [ father.id ];
+  father.rels.spouses = [ mother.id ];
 
-  mother.rels.children = [datum.id];
-  father.rels.children = [datum.id];
+  mother.rels.children = [ datum.id ];
+  father.rels.children = [ datum.id ];
 
   if (!datum.rels.spouses) {
     datum.rels.spouses = [];
@@ -149,9 +149,9 @@ function getDatumRelsData(datum, store_data, addRelLabels) {
       const child = datum_rels.find(d => d.id === child_id);
       if (!child.rels.mother) {
         if (!new_spouse) {
-          new_spouse = createNewPerson({ data: { gender: Gender.F }, rels: { spouses: [datum.id], children: [] } });
+          new_spouse = createNewPerson({ data: { gender: Gender.F }, rels: { spouses: [ datum.id ], children: [] } });
         }
-        new_spouse._new_rel_data = { rel_type: 'spouse', label: addRelLabels.spouse };
+        new_spouse._new_rel_data = { rel_type: "spouse", label: addRelLabels.spouse };
         new_spouse.rels.children.push(child.id);
         datum.rels.spouses.push(new_spouse.id);
         child.rels.mother = new_spouse.id;
@@ -159,9 +159,9 @@ function getDatumRelsData(datum, store_data, addRelLabels) {
       }
       if (!child.rels.father) {
         if (!new_spouse) {
-          new_spouse = createNewPerson({ data: { gender: Gender.M }, rels: { spouses: [datum.id], children: [] } });
+          new_spouse = createNewPerson({ data: { gender: Gender.M }, rels: { spouses: [ datum.id ], children: [] } });
         }
-        new_spouse._new_rel_data = { rel_type: 'spouse', label: addRelLabels.spouse };
+        new_spouse._new_rel_data = { rel_type: "spouse", label: addRelLabels.spouse };
         new_spouse.rels.children.push(child.id);
         datum.rels.spouses.push(new_spouse.id);
         child.rels.father = new_spouse.id;
@@ -170,7 +170,7 @@ function getDatumRelsData(datum, store_data, addRelLabels) {
     });
   }
 
-  const new_spouse = createNewPerson({ data: { gender: Gender.F }, rels: { spouses: [datum.id] } });
+  const new_spouse = createNewPerson({ data: { gender: Gender.F }, rels: { spouses: [ datum.id ], children: [] } });
   new_spouse._new_rel_data = { rel_type: RelType.Spouse, label: addRelLabels.spouse };
   datum.rels.spouses.push(new_spouse.id);
   datum_rels.push(new_spouse);
@@ -185,13 +185,13 @@ function getDatumRelsData(datum, store_data, addRelLabels) {
     }
     spouse.rels.children = spouse.rels.children.filter(child_id => datum.rels.children.includes(child_id));
 
-    const new_son = createNewPerson({ data: { gender: Gender.M }, rels: { father: datum.id, mother: spouse.id } });
+    const new_son = createNewPerson({ data: { gender: Gender.M }, rels: { father: datum.id, mother: spouse.id, children: [] } });
     new_son._new_rel_data = { rel_type: RelType.Son, label: addRelLabels.son, other_parent_id: spouse.id };
     spouse.rels.children.push(new_son.id);
     datum.rels.children.push(new_son.id);
     datum_rels.push(new_son);
 
-    const new_daughter = createNewPerson({ data: { gender: Gender.F }, rels: { mother: spouse.id, father: datum.id } });
+    const new_daughter = createNewPerson({ data: { gender: Gender.F }, rels: { mother: spouse.id, father: datum.id, children: [] } });
     new_daughter._new_rel_data = { rel_type: RelType.Daughter, label: addRelLabels.daughter, other_parent_id: spouse.id };
     spouse.rels.children.push(new_daughter.id);
     datum.rels.children.push(new_daughter.id);
@@ -206,7 +206,7 @@ function findRel(store_data, id) {
 }
 
 function getDatumRels(datum, data) {
-  const datum_rels = [datum];
+  const datum_rels = [ datum ];
   Object.keys(datum.rels).forEach(rel_type => {
     const rel = datum.rels[rel_type];
     if (Array.isArray(rel)) {
@@ -221,12 +221,12 @@ function getDatumRels(datum, data) {
 
   function findAndPushRel(rel_type, rel_id) {
     const rel_datum = findRel(data, rel_id);
-    if (rel_type === 'father' || rel_type === 'mother') {
+    if (rel_type === "father" || rel_type === "mother") {
       delete rel_datum.rels.father;
       delete rel_datum.rels.mother;
     }
 
-    if (rel_type === 'children') {
+    if (rel_type === "children") {
       rel_datum.rels.children = [];
       rel_datum.rels.spouses = [];
     }

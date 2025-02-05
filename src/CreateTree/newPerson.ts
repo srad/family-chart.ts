@@ -1,6 +1,6 @@
-import { removeToAdd } from './form';
-import { Gender, type Person, type PersonData, type Relatives } from '../CalculateTree/CalculateTree';
-import { generateUUID } from '../lib/utils';
+import { removeToAdd } from "./form";
+import { Gender, type Person, type PersonData, type Relatives } from "../CalculateTree/CalculateTree";
+import { generateUUID } from "../lib/utils";
 
 export enum RelType {
   Son, Spouse, Mother, Daughter, Father
@@ -31,7 +31,7 @@ export function handleRelsOfNewDatum({ datum, data_stash, rel_type, rel_datum }:
     if (rel_datum.data.gender === Gender.M) {
       datum.rels.father = rel_datum.id;
     }
-    datum.rels[rel_datum.data.gender === Gender.M ? 'father' : 'mother'] = rel_datum.id;
+    datum.rels[rel_datum.data.gender === Gender.M ? "father" : "mother"] = rel_datum.id;
     if (!rel_datum.rels.children) {
       rel_datum.rels.children = [];
     }
@@ -39,14 +39,14 @@ export function handleRelsOfNewDatum({ datum, data_stash, rel_type, rel_datum }:
     return datum;
 
     function addChildToSpouseAndParentToChild(spouse_id: string) {
-      if (spouse_id === '_new') {
+      if (spouse_id === "_new") {
         spouse_id = addOtherParent().id;
       }
 
       const spouse = data_stash.find(d => d.id === spouse_id);
       if (spouse) {
-        datum.rels[spouse.data.gender === Gender.M ? 'father' : 'mother'] = spouse.id;
-        if (!spouse.rels.hasOwnProperty('children')) {
+        datum.rels[spouse.data.gender === Gender.M ? "father" : "mother"] = spouse.id;
+        if (!spouse.rels.hasOwnProperty("children")) {
           spouse.rels.children = [];
         }
         spouse.rels.children.push(datum.id);
@@ -63,7 +63,7 @@ export function handleRelsOfNewDatum({ datum, data_stash, rel_type, rel_datum }:
 
   function addParent(datum: Person) {
     const is_father = datum.data.gender === Gender.M;
-    const parent_to_add_id = rel_datum.rels[is_father ? 'father' : 'mother'];
+    const parent_to_add_id = rel_datum.rels[is_father ? "father" : "mother"];
 
     if (parent_to_add_id) {
       removeToAdd(data_stash.find(d => d.id === parent_to_add_id), data_stash);
@@ -71,17 +71,17 @@ export function handleRelsOfNewDatum({ datum, data_stash, rel_type, rel_datum }:
     addNewParent();
 
     function addNewParent(): Person | null {
-      rel_datum.rels[is_father ? 'father' : 'mother'] = datum.id;
+      rel_datum.rels[is_father ? "father" : "mother"] = datum.id;
       handleSpouse();
-      datum.rels.children = [rel_datum.id];
+      datum.rels.children = [ rel_datum.id ];
       return datum;
 
       function handleSpouse() {
-        const spouse_id = rel_datum.rels[!is_father ? 'father' : 'mother'];
+        const spouse_id = rel_datum.rels[!is_father ? "father" : "mother"];
         if (!spouse_id) {
           return;
         }
-        datum.rels.spouses = [spouse_id];
+        datum.rels.spouses = [ spouse_id ];
         const spouse = data_stash.find(d => d.id === spouse_id);
         if (spouse) {
           if (!spouse.rels.spouses) {
@@ -101,7 +101,7 @@ export function handleRelsOfNewDatum({ datum, data_stash, rel_type, rel_datum }:
       rel_datum.rels.spouses = [];
     }
     rel_datum.rels.spouses.push(datum.id);
-    datum.rels.spouses = [rel_datum.id];
+    datum.rels.spouses = [ rel_datum.id ];
 
     function removeIfToAdd() {
       if (!rel_datum.rels.spouses) {
@@ -174,17 +174,17 @@ export function handleNewRel({ datum, new_rel_datum, data_stash }: { datum: Pers
       });
 
       new_rel_datum.rels = {
-        spouses: [datum.id],
+        spouses: [ datum.id ],
         children: new_rel_datum.rels.children
       };
       break;
     case RelType.Father:
       datum.rels.father = new_rel_datum.id;
       new_rel_datum.rels = {
-        children: [datum.id],
+        children: [ datum.id ],
       };
       if (datum.rels.mother) {
-        new_rel_datum.rels.spouses = [datum.rels.mother];
+        new_rel_datum.rels.spouses = [ datum.rels.mother ];
         const mother = data_stash.find(d => d.id === datum.rels.mother);
         if (mother) {
           if (!mother.rels.spouses) {
@@ -197,10 +197,10 @@ export function handleNewRel({ datum, new_rel_datum, data_stash }: { datum: Pers
     case RelType.Mother:
       datum.rels.mother = new_rel_datum.id;
       new_rel_datum.rels = {
-        children: [datum.id],
+        children: [ datum.id ],
       };
       if (datum.rels.father) {
-        new_rel_datum.rels.spouses = [datum.rels.father];
+        new_rel_datum.rels.spouses = [ datum.rels.father ];
         const father = data_stash.find(d => d.id === datum.rels.father);
         if (father) {
           if (!father.rels.spouses) {
@@ -224,7 +224,7 @@ export function createNewPersonWithGenderFromRel({ data, rel_type, rel_datum }: 
   data = Object.assign(data || {}, { gender });
   return createNewPerson({ data });
 
-  function getGenderFromRelative(rel_datum: Person, rel_type: RelType: Gender {
+  function getGenderFromRelative(rel_datum: Person, rel_type: RelType): Gender {
     return (rel_type === RelType.Daughter || RelType.Mother) || rel_type === RelType.Spouse && rel_datum.data.gender === Gender.M ? Gender.F : Gender.M;
   }
 }
@@ -234,7 +234,7 @@ export function addNewPerson({ data_stash, datum }) {
 }
 
 export function createTreeDataWithMainNode({ data, version }) {
-  return { data: [createNewPerson({ data })], version };
+  return { data: [ createNewPerson({ data }) ], version };
 }
 
 export function addNewPersonAndHandleRels({ datum, data_stash, rel_type, rel_datum }) {

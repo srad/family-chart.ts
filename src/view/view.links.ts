@@ -1,12 +1,12 @@
 import d3 from "../d3";
 
-import { createLinks } from "../CalculateTree/createLinks";
+import { linkBuilder } from "../CalculateTree/LinkBuilder";
 import { createPath } from "./elements/Link";
 import { calculateDelay } from "./view";
 
 export default function updateLinks(svg, tree, props = {}) {
   const links_data_dct = tree.data.reduce((acc, d) => {
-    createLinks({ d, tree: tree.data, is_horizontal: tree.is_horizontal }).forEach(l => acc[l.id] = l);
+    linkBuilder({ d, tree: tree.data, is_horizontal: tree.is_horizontal }).forEach(l => acc[l.id] = l);
     return acc;
   }, {});
   const links_data = Object.values(links_data_dct);

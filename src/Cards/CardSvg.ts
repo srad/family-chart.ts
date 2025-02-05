@@ -1,11 +1,10 @@
-import { updateCardSvgDefs } from '../view/elements/Card.defs';
-import { processCardDisplay } from './utils';
-import { CardBase, DatumType, Store } from './CardBase';
-import { select } from 'd3';
-import { Card } from '../view/elements/Card';
-import { PersonData } from '../CalculateTree/CalculateTree';
+import { updateCardSvgDefs } from "../view/elements/Card.defs";
+import { processCardDisplay } from "./utils";
+import { CardBase, Store } from "./CardBase";
+import { select } from "d3";
+import { Card } from "../view/elements/Card";
+import { PersonData } from "../CalculateTree/CalculateTree";
 
-CardSvgWrapper.is_html = false;
 export default function CardSvgWrapper(cont: HTMLElement, store: Store<PersonData>) {
   return new CardSvg(cont, store);
 }
@@ -17,12 +16,13 @@ export class CardSvg extends CardBase<PersonData> {
   constructor(cont: HTMLElement, store: Store<PersonData>) {
     super(cont, store);
     this.card_dim = { w: 220, h: 70, text_x: 75, text_y: 15, img_w: 60, img_h: 60, img_x: 5, img_y: 5 };
-    this.card_display = [d => `${d.data['first name']} ${d.data['last name']}`];
+    this.card_display = [ d => `${d.data["first name"]} ${d.data["last name"]}` ];
     this.mini_tree = true;
     this.link_break = false;
     this.onCardClick = this.onCardClickDefault;
+    this.is_html = false;
 
-    this.svg = this.cont.querySelector('svg.main_svg');
+    this.svg = this.cont.querySelector("svg.main_svg");
 
     this.getCard = () => Card({
       store: this.store,
@@ -43,21 +43,21 @@ export class CardSvg extends CardBase<PersonData> {
   }
 
   setCardDim(card_dim) {
-    if (typeof card_dim !== 'object') {
-      console.error('card_dim must be an object');
+    if (typeof card_dim !== "object") {
+      console.error("card_dim must be an object");
       return this;
     }
     for (let key in card_dim) {
       const val = card_dim[key];
-      if (typeof val !== 'number') {
+      if (typeof val !== "number") {
         console.error(`card_dim.${key} must be a number`);
         return this;
       }
-      if (key === 'width') {
-        key = 'w';
+      if (key === "width") {
+        key = "w";
       }
-      if (key === 'height') {
-        key = 'h';
+      if (key === "height") {
+        key = "h";
       }
       this.card_dim[key] = val;
     }
@@ -82,16 +82,16 @@ export class CardSvg extends CardBase<PersonData> {
   setCardTextSvg(cardTextSvg) {
     function onCardUpdate(d) {
       const card_node = select(this);
-      const card_text = card_node.select('.card-text text');
+      const card_text = card_node.select(".card-text text");
       const card_text_g = card_text.node().parentNode;
       card_text_g.innerHTML = cardTextSvg(d.data);
     }
 
-    onCardUpdate.id = 'setCardTextSvg';
+    onCardUpdate.id = "setCardTextSvg";
     if (!this.onCardUpdates) {
       this.onCardUpdates = [];
     }
-    this.onCardUpdates = this.onCardUpdates.filter(fn => fn.id !== 'setCardTextSvg');
+    this.onCardUpdates = this.onCardUpdates.filter(fn => fn.id !== "setCardTextSvg");
     this.onCardUpdates.push(onCardUpdate);
 
     return this;

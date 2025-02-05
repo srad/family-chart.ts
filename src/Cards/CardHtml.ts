@@ -1,8 +1,8 @@
-import { select } from 'd3';
-import { processCardDisplay } from './utils';
-import { pathToMain } from '../CalculateTree/createLinks';
-import { CardBase, Store } from './CardBase';
-import { CardStyle, createCardHtml } from '../view/elements/CardHtml';
+import { select } from "d3";
+import { processCardDisplay } from "./utils";
+import { pathToMain } from "../CalculateTree/LinkBuilder";
+import { CardBase, Store } from "./CardBase";
+import { CardStyle, createCardHtml } from "../view/elements/CardHtml";
 
 export default function CardHtmlWrapper(cont: HTMLElement, store: Store<CardHtmlStore>) {
   return new CardHtml(cont, store);
@@ -20,7 +20,7 @@ export class CardHtml extends CardBase<CardHtmlStore> {
   constructor(cont: HTMLElement, store: Store<CardHtmlStore>) {
     super(cont, store);
     this.getCard = null;
-    this.card_display = [d => `${d.data['first name']} ${d.data['last name']}`];
+    this.card_display = [ d => `${d.data["first name"]} ${d.data["last name"]}` ];
     this.onCardClick = this.onCardClickDefault;
     this.style = CardStyle.Default;
     this.mini_tree = false;
@@ -37,7 +37,7 @@ export class CardHtml extends CardBase<CardHtmlStore> {
       w: 0,
     };
 
-    this.svg = this.cont.querySelector('svg.main_svg');
+    this.svg = this.cont.querySelector("svg.main_svg");
 
     this.getCard = () => createCardHtml({
       // TODO: Not defined in function, was it "data"?
@@ -86,33 +86,33 @@ export class CardHtml extends CardBase<CardHtmlStore> {
   }
 
   setCardDim(card_dim) {
-    if (typeof card_dim !== 'object') {
-      console.error('card_dim must be an object');
+    if (typeof card_dim !== "object") {
+      console.error("card_dim must be an object");
       return this;
     }
     for (let key in card_dim) {
       const val = card_dim[key];
-      if (typeof val !== 'number' && typeof val !== 'boolean') {
+      if (typeof val !== "number" && typeof val !== "boolean") {
         console.error(`card_dim.${key} must be a number or boolean`);
         return this;
       }
-      if (key === 'width') {
-        key = 'w';
+      if (key === "width") {
+        key = "w";
       }
-      if (key === 'height') {
-        key = 'h';
+      if (key === "height") {
+        key = "h";
       }
-      if (key === 'img_width') {
-        key = 'img_w';
+      if (key === "img_width") {
+        key = "img_w";
       }
-      if (key === 'img_height') {
-        key = 'img_h';
+      if (key === "img_height") {
+        key = "img_h";
       }
-      if (key === 'img_x') {
-        key = 'img_x';
+      if (key === "img_x") {
+        key = "img_x";
       }
-      if (key === 'img_y') {
-        key = 'img_y';
+      if (key === "img_y") {
+        key = "img_y";
       }
       this.card_dim[key] = val;
     }
@@ -149,20 +149,20 @@ export class CardHtml extends CardBase<CardHtmlStore> {
   onEnterPathToMain(e, datum) {
     this.to_transition = datum.data.id;
     const main_datum = this.store.getTreeMainDatum();
-    const cards = select(this.cont).select('div.cards_view').selectAll('.card_cont');
-    const links = select(this.cont).select('svg.main_svg .links_view').selectAll('.link');
-    const [cards_node_to_main, links_node_to_main] = pathToMain(cards, links, datum, main_datum);
+    const cards = select(this.cont).select("div.cards_view").selectAll(".card_cont");
+    const links = select(this.cont).select("svg.main_svg .links_view").selectAll(".link");
+    const [ cards_node_to_main, links_node_to_main ] = pathToMain(cards, links, datum, main_datum);
     cards_node_to_main.forEach(d => {
       const delay = Math.abs(datum.depth - d.card.depth) * 200;
-      select(d.node.querySelector('div.card-inner'))
+      select(d.node.querySelector("div.card-inner"))
         .transition().duration(0).delay(delay)
-        .on('end', () => this.to_transition === datum.data.id && select(d.node.querySelector('div.card-inner')).classed('f3-path-to-main', true));
+        .on("end", () => this.to_transition === datum.data.id && select(d.node.querySelector("div.card-inner")).classed("f3-path-to-main", true));
     });
     links_node_to_main.forEach(d => {
       const delay = Math.abs(datum.depth - d.link.depth) * 200;
       select(d.node)
         .transition().duration(0).delay(delay)
-        .on('end', () => this.to_transition === datum.data.id && select(d.node).classed('f3-path-to-main', true));
+        .on("end", () => this.to_transition === datum.data.id && select(d.node).classed("f3-path-to-main", true));
     });
 
     return this;
@@ -170,8 +170,8 @@ export class CardHtml extends CardBase<CardHtmlStore> {
 
   onLeavePathToMain(e, d) {
     this.to_transition = false;
-    select(this.cont).select('div.cards_view').selectAll('div.card-inner').classed('f3-path-to-main', false);
-    select(this.cont).select('svg.main_svg .links_view').selectAll('.link').classed('f3-path-to-main', false);
+    select(this.cont).select("div.cards_view").selectAll("div.card-inner").classed("f3-path-to-main", false);
+    select(this.cont).select("svg.main_svg .links_view").selectAll(".link").classed("f3-path-to-main", false);
     return this;
   }
 }

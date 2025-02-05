@@ -1,5 +1,5 @@
-import { Gender, Person, Spouse, TreeInfo } from './CalculateTree';
-import { DatumType } from '../Cards/CardBase';
+import { Gender, Person, Spouse } from "./CalculateTree";
+import { DatumType } from "../Cards/CardBase";
 
 export function sortChildrenWithSpouses(data: Person[]) {
   data.forEach(datum => {
@@ -63,12 +63,12 @@ export type TreeDatum = {
 
 export function toggleRels(tree_datum: TreeDatum, hide_rels) {
   const
-    rels = hide_rels ? 'rels' : '_rels',
-    rels_ = hide_rels ? '_rels' : 'rels';
+    rels = hide_rels ? "rels" : "_rels",
+    rels_ = hide_rels ? "_rels" : "rels";
 
   if (tree_datum.is_ancestry || tree_datum.data.main) {
-    showHideAncestry('father');
-    showHideAncestry('mother');
+    showHideAncestry("father");
+    showHideAncestry("mother");
   } else {
     showHideChildren();
   }
@@ -90,9 +90,9 @@ export function toggleRels(tree_datum: TreeDatum, hide_rels) {
     }
     const
       children = tree_datum.data[rels].children.slice(0),
-      spouses = tree_datum.spouse ? [tree_datum.spouse] : tree_datum.spouses || [];
+      spouses = tree_datum.spouse ? [ tree_datum.spouse ] : tree_datum.spouses || [];
 
-    [tree_datum, ...spouses].forEach(sp => children.forEach(ch_id => {
+    [ tree_datum, ...spouses ].forEach(sp => children.forEach(ch_id => {
       if (sp.data[rels].children.includes(ch_id)) {
         if (!sp.data[rels_]) {
           sp.data[rels_] = {};
@@ -113,4 +113,3 @@ export function toggleAllRels(tree_data, hide_rels) {
     toggleRels(d, hide_rels);
   });
 }
-
