@@ -2,6 +2,7 @@ import { select, zoomIdentity } from "d3";
 
 export class SvgNode extends Element {
   public __zoomObj: any; // TODO: Is this some d3 super duper object?
+  public  __zoom: boolean;
   public transform: string;
   public parentNode: SvgNode;
 }

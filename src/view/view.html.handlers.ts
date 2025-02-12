@@ -1,9 +1,10 @@
-import { select } from 'd3';
+import { BaseType, select } from 'd3';
+import { DatumType } from "./Models/DatumType";
 
-export function assignUniqueIdToTreeData(div, tree_data) {
+export function assignUniqueIdToTreeData(div: BaseType, tree_data) {
   const card = select(div)
     .selectAll('div.card_cont_2fake')
-    .data(tree_data, d => d.data.id);  // how this doesn't break if there is multiple cards with the same id?
+    .data(tree_data, (d: DatumType) => d.data.id);  // how this doesn't break if there is multiple cards with the same id?
 
   const card_exit = card.exit();
   const card_enter = card.enter().append('div').attr('class', 'card_cont_2fake').style('display', 'none').attr('data-id', () => Math.random());
@@ -31,7 +32,7 @@ export function setupHtmlSvg(getHtmlSvg) {
   select(getHtmlSvg()).append('div').attr('class', 'cards_view_fake').style('display', 'none');  // important for handling data
 }
 
-export function getCardsViewFake(getHtmlSvg) {
+export function getCardsViewFake(getHtmlSvg: () => HTMLElement): BaseType {
   return select(getHtmlSvg()).select('div.cards_view_fake').node();
 }
 
@@ -49,7 +50,7 @@ export function setupReactiveTreeData(getHtmlSvg) {
 
   return function getReactiveTreeData(new_tree_data) {
     const tree_data_exit = getTreeDataExit(new_tree_data, tree_data);
-    tree_data = [...new_tree_data, ...tree_data_exit];
+    tree_data = [ ...new_tree_data, ...tree_data_exit ];
     assignUniqueIdToTreeData(getCardsViewFake(getHtmlSvg), tree_data);
     return tree_data;
   };

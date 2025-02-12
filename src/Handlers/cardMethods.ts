@@ -3,6 +3,12 @@ import { deletePerson, moveToAddToAdded } from "../CreateTree/form";
 import { Person } from "../CalculateTree/CalculateTree";
 import { Store } from "../Cards/CardBase";
 
+export type CardEditFormArgs = {
+  datum: Person;
+  postSubmit: (props: any) => void;
+  store: Store<any>;
+}
+
 export function cardChangeMain(store, { d }) {
   toggleAllRels(store.getTree().data, false);
   store.updateMainId(d.data.id);
@@ -10,7 +16,7 @@ export function cardChangeMain(store, { d }) {
   return true;
 }
 
-export function cardEdit(store: Store<any>, { d, cardEditForm }: { d: { data: Person }, cardEditForm: (form: { datum: Person, postSubmit: (props: any) => void, store: Store<any> }) => void }) {
+export function cardEdit(store: Store<any>, { d, cardEditForm }: { d: { data: Person }, cardEditForm: (form: CardEditFormArgs) => void }) {
   const datum = d.data,
     postSubmit = (props) => {
       if (datum.to_add) {

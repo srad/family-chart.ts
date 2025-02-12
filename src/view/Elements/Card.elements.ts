@@ -1,4 +1,4 @@
-import { cardChangeMain, cardEdit, cardShowHideRels } from "../../handlers/cardMethods";
+import { cardChangeMain, cardEdit, cardShowHideRels } from "../../Handlers/cardMethods";
 import { CardBody, CardBodyAddNew, CardImage, LinkBreakIconWrapper, MiniTree, PencilIcon, PlusIcon } from "./Card.templates";
 import { create } from "d3";
 import { CardHtml } from "../../Cards/CardHtml";

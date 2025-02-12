@@ -1,6 +1,6 @@
 import { removeToAdd } from "./form";
 import { Gender, type Person, type PersonData, type Relatives } from "../CalculateTree/CalculateTree";
-import { generateUUID } from "../lib/utils";
+import { generateUUID } from "../Helpers/utils";
 
 export enum RelType {
   Son, Spouse, Mother, Daughter, Father

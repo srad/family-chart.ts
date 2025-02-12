@@ -1,5 +1,5 @@
-import CalculateTree from './CalculateTree/CalculateTree';
-import { DatumType } from './Cards/CardBase';
+import CalculateTree from "./CalculateTree/CalculateTree";
+import { DatumType } from "./view/Models/DatumType";
 
 export type State = {
   is_horizontal: boolean;
@@ -13,7 +13,7 @@ export type State = {
 }
 
 export default function createStore(initial_state: State) {
-  let onUpdate;
+  let onUpdate = (options: any) => void | null;
   const state = initial_state;
   state.main_id_history = [];
 

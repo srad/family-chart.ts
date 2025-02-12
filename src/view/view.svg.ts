@@ -1,6 +1,7 @@
 import { create, zoom as d3zoom, select } from 'd3';
+import { SvgNode } from "./view.handlers";
 
-export default function createSvg(cont: HTMLElement, props = {}) {
+export default function createSvg(cont: HTMLElement, props = {}): Element {
   const svg_dim = cont.getBoundingClientRect();
   const svg_html = (`
     <svg class="main_svg">
@@ -32,16 +33,19 @@ export default function createSvg(cont: HTMLElement, props = {}) {
 
   return svg;
 
-  function getOrCreateF3Canvas(cont: HTMLElement) {
+  function getOrCreateF3Canvas(cont: HTMLElement): SvgNode {
     let f3Canvas = cont.querySelector('#f3Canvas');
     if (!f3Canvas) {
-      f3Canvas = create('div').attr('id', 'f3Canvas').attr('style', 'position: relative; overflow: hidden; width: 100%; height: 100%;').node();
+      f3Canvas = create('div')
+        .attr('id', 'f3Canvas')
+        .attr('style', 'position: relative; overflow: hidden; width: 100%; height: 100%;')
+        .node();
     }
-    return f3Canvas;
+    return f3Canvas as SvgNode;
   }
 }
 
-function setupZoom(el, props: { onZoom?: () => void, zoom_polite?: boolean } = {}) {
+function setupZoom(el: SvgNode, props: { onZoom?: () => void, zoom_polite?: boolean } = {}) {
   if (el.__zoom) {
     return;
   }

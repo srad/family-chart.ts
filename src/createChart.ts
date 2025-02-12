@@ -1,58 +1,47 @@
-import editTree from './CreateTree/editTree';
-import createSvg from './view/view.svg';
-import { createHtmlSvg, onZoomSetup } from './view/view.html.handlers';
-import createStore from './createStore';
-import { removeToAddFromData } from './CreateTree/form';
-import { CardBase, DatumType } from './Cards/CardBase';
-import { CardSvg } from './Cards/CardSvg';
-import view from './view/view';
-
-export default function (...args) {
-  return new CreateChart(...args);
-}
+import editTree from "./CreateTree/editTree";
+import createSvg from "./view/view.svg";
+import { createHtmlSvg, onZoomSetup } from "./view/view.html.handlers";
+import createStore from "./createStore";
+import { removeToAddFromData } from "./CreateTree/form";
+import { CardBase } from "./Cards/CardBase";
+import { CardSvg } from "./Cards/CardSvg";
+import view from "./view/view";
+import { DatumType } from "./view/Models/DatumType";
+import { CardHtml } from "./Cards/CardHtml";
+import CardElements from "./view/Elements/Card.elements";
 
 type MyStore = {
   level_separation: number;
 }
 
-class CreateChart extends CardBase<MyStore> {
-  private node_separation: number;
-  private level_separation: number;
+export class CreateChart extends CardBase<MyStore> {
   private transition_time: number;
-  private is_horizontal: boolean;
-  private single_parent_empty_card: boolean;
   private is_card_html: boolean;
-
-  constructor(cont: Element, data: DatumType) {
+  private svgElement: SVGElement;
+  
+  constructor(cont: HTMLElement, data: DatumType) {
     super(cont, createStore({
       data,
-      node_separation: this.node_separation,
-      level_separation: this.level_separation,
-      single_parent_empty_card: this.single_parent_empty_card,
-      is_horizontal: this.is_horizontal
+      node_separation: 250,
+      level_separation: 150,
+      single_parent_empty_card: true,
+      is_horizontal: false,
     }));
 
-    this.node_separation = 250;
-    this.level_separation = 150;
-    this.is_horizontal = false;
-    this.single_parent_empty_card = true;
     this.transition_time = 2000;
 
     this.is_card_html = false;
-
-    this.beforeUpdate = null;
-    this.afterUpdate = null;
 
     this.init(cont, data);
 
     return this;
   }
 
-  selectinitselect(cont: HTMLElement, data: DatumType[]) {
+  init(cont: HTMLElement, data: DatumType[]) {
     this.cont = cont = setCont(cont);
-    const getSvgView = () => cont.querySelector('svg .view');
-    const getHtmlSvg = () => cont.querySelector('#htmlSvg');
-    const getHtmlView = () => cont.querySelector('#htmlSvg .cards_view');
+    const getSvgView = () => cont.querySelector("svg .view");
+    const getHtmlSvg = () => cont.querySelector("#htmlSvg");
+    const getHtmlView = () => cont.querySelector("#htmlSvg .cards_view");
 
     this.svg = createSvg(cont, { onZoom: onZoomSetup(getSvgView, getHtmlView) });
     createHtmlSvg(cont);
@@ -74,19 +63,19 @@ class CreateChart extends CardBase<MyStore> {
     });
   }
 
-  selectupdateTreeselect(props = { initial: false }) {
+  updateTreeselect(props = { initial: false }) {
     this.store.updateTree(props);
     return this;
   }
 
-  selectupdateDataselect(data: DatumType) {
+  updateDataselect(data: DatumType) {
     this.store.updateData(data);
     return this;
   }
 
-  selectsetCardYSpacingselect(card_y_spacing) {
-    if (typeof card_y_spacing !== 'number') {
-      console.error('card_y_spacing must be a number');
+  setCardYSpacingselect(card_y_spacing) {
+    if (typeof card_y_spacing !== "number") {
+      console.error("card_y_spacing must be a number");
       return this;
     }
     this.level_separation = card_y_spacing;
@@ -95,9 +84,9 @@ class CreateChart extends CardBase<MyStore> {
     return this;
   }
 
-  selectsetCardXSpacingselect(card_x_spacing) {
-    if (typeof card_x_spacing !== 'number') {
-      console.error('card_x_spacing must be a number');
+  setCardXSpacingselect(card_x_spacing) {
+    if (typeof card_x_spacing !== "number") {
+      console.error("card_x_spacing must be a number");
       return this;
     }
     this.node_separation = card_x_spacing;
@@ -118,7 +107,7 @@ class CreateChart extends CardBase<MyStore> {
     return this;
   }
 
-  selectsetSingleParentEmptyCardselect(single_parent_empty_card, { label = 'Unknown' } = {}) {
+  selectsetSingleParentEmptyCardselect(single_parent_empty_card, { label = "Unknown" } = {}) {
     this.single_parent_empty_card = single_parent_empty_card;
     this.store.state.single_parent_empty_card = single_parent_empty_card;
     this.store.state.single_parent_empty_card_label = label;
@@ -129,18 +118,18 @@ class CreateChart extends CardBase<MyStore> {
     return this;
   };
 
-  selectsetCardselect(Card) {
-    this.is_card_html = Card.is_html;
+  setCard(card: CardHtml) {
+    this.is_card_html = card.is_html;
 
     if (this.is_card_html) {
-      this.svg.querySelector('.cards_view').innerHTML = '';
-      this.cont.querySelector('#htmlSvg').style.display = 'block';
+      this.svg.querySelector(".cards_view").innerHTML = "";
+      this.cont.querySelector("#htmlSvg").style.display = "block";
     } else {
-      this.cont.querySelector('#htmlSvg .cards_view').innerHTML = '';
-      this.cont.querySelector('#htmlSvg').style.display = 'none';
+      this.cont.querySelector("#htmlSvg .cards_view").innerHTML = "";
+      this.cont.querySelector("#htmlSvg").style.display = "none";
     }
 
-    const card = Card(this.cont, this.store);
+    const card = card(this.cont, this.store);
     this.getCard = () => card.getCard();
 
     return card;
@@ -190,7 +179,7 @@ class CreateChart extends CardBase<MyStore> {
 }
 
 function setCont(cont) {
-  if (typeof cont === 'string') {
+  if (typeof cont === "string") {
     cont = document.querySelector(cont);
   }
   return cont;

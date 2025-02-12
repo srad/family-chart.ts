@@ -100,7 +100,8 @@ export function createForm({ datum, store, fields, postSubmit, addRelative, dele
   }
 
   function deletePersonWithPostSubmit() {
-    deletePerson();
+    // TODO: deletePerson();
+    alert('Check this code');
     postSubmit({ delete: true });
   }
 }

@@ -1,13 +1,6 @@
-﻿import type { SvgNode } from '../view/view.handlers.ts';
+﻿import type { SvgNode } from "../view/view.handlers.ts";
 import { Person } from "../CalculateTree/CalculateTree";
-
-export type DatumType = {
-  main: boolean;
-  main_id: string;
-  id: string;
-  data: DatumType;
-  _new_rel_data?: boolean;
-}
+import { DatumType } from "../view/Models/DatumType";
 
 export type Store<T> = {
   state: T;
@@ -40,12 +33,18 @@ export abstract class CardBase<T> {
   protected getCard?: () => void;
   protected cont: Element;
   protected store: Store<T>;
-  protected is_html: boolean = false;
-  protected svg: SvgNode | null = null;
+  public is_html: boolean = false;
+  protected svg: SvgNode | Element | null = null;
   protected onCardUpdate: (() => void) | null = null;
   protected onCardClick: ((e: Event, d: Element) => void) | null = null;
   protected onCardMouseenter: (() => void) | null = null;
   protected onCardMouseleave: (() => void) | null = null;
+  protected node_separation: number;
+  protected level_separation: number;
+  protected single_parent_empty_card: boolean;
+  protected is_horizontal: boolean;
+  protected beforeUpdate?: () => void = null;
+  protected afterUpdate?: () => void = null;
 
   // TODO: Really?
   protected onCardUpdates: ({ (d: any): void; id: string; })[] | null = null;

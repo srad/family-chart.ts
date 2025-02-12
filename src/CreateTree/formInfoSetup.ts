@@ -1,4 +1,4 @@
-import * as icons from '../view/elements/Card.icons';
+import * as icons from '../view/Elements/Card.icons';
 import { Form } from './form';
 
 export function formInfoSetup(form_creator: Form, closeCallback: () => void) {
@@ -7,9 +7,7 @@ export function formInfoSetup(form_creator: Form, closeCallback: () => void) {
   return formContainer;
 
   function update() {
-    const formHtml = getHtml(form_creator);
-
-    formContainer.innerHTML = formHtml;
+    formContainer.innerHTML = getHtml(form_creator);
 
     setupEventListeners();
 

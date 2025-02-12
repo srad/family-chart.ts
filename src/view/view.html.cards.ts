@@ -2,9 +2,10 @@ import { calculateEnterAndExitPositions } from '../CalculateTree/CalculateTree.h
 import { calculateDelay } from './view';
 import { select } from 'd3';
 import { CardUpdateOptions } from './view.cards';
+import { DatumType } from "./Models/DatumType";
 
-export default function updateCardsHtml(div, tree, Card, props: CardUpdateOptions = {}) {
-  const card = select(div).select('.cards_view').selectAll('div.card_cont').data(tree.data, d => d.data.id),
+export default function updateCardsHtml(div, tree, Card, props: CardUpdateOptions) {
+  const card = select(div).select('.cards_view').selectAll('div.card_cont').data(tree.data, (d: DatumType) => d.data.id),
     card_exit = card.exit(),
     card_enter = card.enter().append('div').attr('class', 'card_cont').style('pointer-events', 'none'),
     card_update = card_enter.merge(card);

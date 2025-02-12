@@ -11,7 +11,7 @@ export default function Link({ d, entering, exiting }) {
 }
 
 // TODO: exiting was missing
-export function createPath(d, is_, exiting = false) {
+export function createPath(d, is_ = false, exiting = false) {
   const line = d3line().curve(curveMonotoneY),
     lineCurve = d3line().curve(curveBasis),
     path_data = is_ ? d._d() : d.d;

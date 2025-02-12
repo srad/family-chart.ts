@@ -1,5 +1,5 @@
-export * from "./handlers/general";
-export * from "./handlers/cardMethods";
+export * from "./Handlers/general";
+export * from "./Handlers/cardMethods";
 export * from "./CreateTree/newPerson";
 export * from "./CreateTree/checkIfRelativesConnectedWithoutPerson";
 export * from "./CreateTree/form";

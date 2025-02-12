@@ -1,18 +1,33 @@
-import d3 from "../d3";
+import { select } from "d3";
 
 import { linkBuilder } from "../CalculateTree/LinkBuilder";
-import { createPath } from "./elements/Link";
+import { createPath } from "./Elements/Link";
 import { calculateDelay } from "./view";
+import { DatumType } from "./Models/DatumType";
 
-export default function updateLinks(svg, tree, props = {}) {
+export type LinkOptions = {
+  initial?: boolean;
+  transition_time: number;
+};
+
+export default function updateLinks(svg, tree, props: LinkOptions) {
   const links_data_dct = tree.data.reduce((acc, d) => {
     linkBuilder({ d, tree: tree.data, is_horizontal: tree.is_horizontal }).forEach(l => acc[l.id] = l);
     return acc;
   }, {});
   const links_data = Object.values(links_data_dct);
-  const link = d3.select(svg).select(".links_view").selectAll("path.link").data(links_data, d => d.id);
+
+  const link = select(svg)
+    .select(".links_view")
+    .selectAll("path.link")
+    .data(links_data, (d: DatumType) => d.id);
+
   const link_exit = link.exit();
-  const link_enter = link.enter().append("path").attr("class", "link");
+  
+  const link_enter = link.enter()
+    .append("path")
+    .attr("class", "link");
+  
   const link_update = link_enter.merge(link);
 
   link_exit.each(linkExit);
@@ -20,18 +35,18 @@ export default function updateLinks(svg, tree, props = {}) {
   link_update.each(linkUpdate);
 
   function linkEnter(d) {
-    d3.select(this).attr("fill", "none").attr("stroke", "#fff").attr("stroke-width", 1).style("opacity", 0)
+    select(this).attr("fill", "none").attr("stroke", "#fff").attr("stroke-width", 1).style("opacity", 0)
       .attr("d", createPath(d, true));
   }
 
   function linkUpdate(d) {
-    const path = d3.select(this);
+    const path = select(this);
     const delay = props.initial ? calculateDelay(tree, d, props.transition_time) : 0;
     path.transition("path").duration(props.transition_time).delay(delay).attr("d", createPath(d)).style("opacity", 1);
   }
 
   function linkExit(d) {
-    const path = d3.select(this);
+    const path = select(this);
     path.transition("op").duration(800).style("opacity", 0);
     path.transition("path").duration(props.transition_time).attr("d", createPath(d, true))
       .on("end", () => path.remove());

@@ -2,7 +2,7 @@ import { select } from "d3";
 import { processCardDisplay } from "./utils";
 import { pathToMain } from "../CalculateTree/LinkBuilder";
 import { CardBase, Store } from "./CardBase";
-import { CardStyle, createCardHtml } from "../view/elements/CardHtml";
+import { CardStyle, createCardHtml } from "../view/Elements/CardHtml";
 
 export default function CardHtmlWrapper(cont: HTMLElement, store: Store<CardHtmlStore>) {
   return new CardHtml(cont, store);

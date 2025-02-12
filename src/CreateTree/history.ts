@@ -1,8 +1,9 @@
 import { cleanupDataJson } from "./form";
-import * as icons from "../view/elements/Card.icons";
-import { DatumType, Store } from "../Cards/CardBase";
+import * as icons from "../view/Elements/Card.icons";
+import { Store } from "../Cards/CardBase";
 import { select } from "d3";
 import { Person } from "../CalculateTree/CalculateTree";
+import { DatumType } from "../view/Models/DatumType";
 
 export type History = {
   controls?: HistoryControls;
@@ -67,21 +68,28 @@ export function createHistory(store: Store<DatumType>, getStoreData: () => Datum
 }
 
 export type HistoryControls = {
-  back_btn: () => void;
-  forward_btn: () => void;
+  back_btn: HTMLButtonElement;
+  forward_btn: HTMLButtonElement;
   updateButtons: () => void;
   destroy: () => void;
 };
 
-export function createHistoryControls(cont: HTMLElement, history: History, onUpdate?: () => void) {
-  const history_controls = select(cont).append("div").attr("class", "f3-history-controls");
-  const back_btn = history_controls.append("button").attr("class", "f3-back-button").on("click", () => {
-    history.back();
-    updateButtons();
-    if (onUpdate) {
-      onUpdate();
-    }
-  });
+export function createHistoryControls(cont: HTMLElement, history: History, onUpdate?: () => void): HistoryControls {
+  const history_controls = select(cont)
+    .append("div")
+    .attr("class", "f3-history-controls");
+
+  const back_btn = history_controls
+    .append("button")
+    .attr("class", "f3-back-button")
+    .on("click", () => {
+      history.back();
+      updateButtons();
+      if (onUpdate) {
+        onUpdate();
+      }
+    });
+
   const forward_btn = history_controls.append("button").attr("class", "f3-forward-button").on("click", () => {
     history.forward();
     updateButtons();

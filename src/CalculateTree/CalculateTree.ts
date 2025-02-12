@@ -1,9 +1,9 @@
 import { sortChildrenWithSpouses } from "./CalculateTree.handlers";
 import { createNewPerson, RelType } from "../CreateTree/newPerson";
-import { isAllRelativeDisplayed } from "../handlers/general";
+import { isAllRelativeDisplayed } from "../Handlers/general";
 import { extent as d3extent, hierarchy as d3hierarchy, HierarchyPointNode, tree as d3tree } from "d3";
 import type { TreeDim } from "../view/view.handlers";
-import type { DatumType } from "../Cards/CardBase";
+import { DatumType } from "../view/Models/DatumType";
 
 export type Spouse = {
   y: number;
@@ -42,7 +42,7 @@ export type PersonData = {
 };
 
 export type Person = {
-  main_id: string;
+  main_id?: string;
   id: string;
   data: PersonData;
   rels: Relatives;
@@ -54,8 +54,8 @@ export type Person = {
 }
 
 export type TreeInfo = {
-  dim: TreeDim;
-  data?: any[];
+  dim?: TreeDim;
+  data?: DatumType[];
   main_id: string | null;
   node_separation: number;
   level_separation: number;

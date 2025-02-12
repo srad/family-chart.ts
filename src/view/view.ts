@@ -17,7 +17,7 @@ export default function (tree: TreeInfo, svg: SvgNode, Card: CardSvg, props: Car
   } else {
     updateCards(svg, tree, Card, props);
   }
-  updateLinks(svg, tree, props);
+  updateLinks(svg, tree, { initial: props.initial, transition_time: props.transition_time });
 
   const tree_position = props.tree_position || TreePosition.Fit;
   if (props.initial) {

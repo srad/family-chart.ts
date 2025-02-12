@@ -1,8 +1,8 @@
-import { updateCardSvgDefs } from "../view/elements/Card.defs";
+import { updateCardSvgDefs } from "../view/Elements/Card.defs";
 import { processCardDisplay } from "./utils";
 import { CardBase, Store } from "./CardBase";
 import { select } from "d3";
-import { Card } from "../view/elements/Card";
+import { Card } from "../view/Elements/Card";
 import { PersonData } from "../CalculateTree/CalculateTree";
 
 export default function CardSvgWrapper(cont: HTMLElement, store: Store<PersonData>) {
@@ -82,8 +82,8 @@ export class CardSvg extends CardBase<PersonData> {
   setCardTextSvg(cardTextSvg) {
     function onCardUpdate(d) {
       const card_node = select(this);
-      const card_text = card_node.select(".card-text text");
-      const card_text_g = card_text.node().parentNode;
+      const card_text = card_node.select<HTMLElement>(".card-text text");
+      const card_text_g = card_text.node().parentNode as HTMLElement;
       card_text_g.innerHTML = cardTextSvg(d.data);
     }
 

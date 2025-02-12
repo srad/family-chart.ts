@@ -1,6 +1,7 @@
-import type { Person } from "../CalculateTree/CalculateTree.ts";
+import type { Person, PersonData, Relatives } from "../CalculateTree/CalculateTree.ts";
 import { select } from "d3";
 import type { SvgNode } from "../view/view.handlers.ts";
+import { RelType } from "../CreateTree/newPerson";
 
 export function manualZoom({ amount, svg, transition_time = 500 }: { amount: number; svg: SvgNode, transition_time: number }) {
   const zoom = svg.__zoomObj;
@@ -8,8 +9,14 @@ export function manualZoom({ amount, svg, transition_time = 500 }: { amount: num
     .call(zoom.scaleBy, amount);
 }
 
-export function isAllRelativeDisplayed(d: Person, data: Person[]) {
+export function isAllRelativeDisplayed(d: Person, data: PersonData): boolean {
+  /*
+  TODO: Types dont makes sense here, what is going on?
   const r = d.data.rels,
     all_rels = [ r.father, r.mother, ...(r.spouses || []), ...(r.children || []) ].filter(v => v);
   return all_rels.every(rel_id => data.some(d => d.data.id === rel_id));
+  
+   */
+  alert("Check code");
+  return false;
 }

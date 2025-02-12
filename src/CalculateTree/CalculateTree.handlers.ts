@@ -1,5 +1,5 @@
 import { Gender, Person, Spouse } from "./CalculateTree";
-import { DatumType } from "../Cards/CardBase";
+import { DatumType } from "../view/Models/DatumType";
 
 export function sortChildrenWithSpouses(data: Person[]) {
   data.forEach(datum => {

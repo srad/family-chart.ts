@@ -5,6 +5,8 @@ export type NodeInfo = {
   is_ancestry: boolean;
   x: number;
   y: number;
+  _x: number;
+  _y: number;
   sx: number;
   sy: number;
   depth: number;

@@ -1,8 +1,8 @@
 import { createNewPerson, handleNewRel, RelType } from "./newPerson";
 import { Store } from "../Cards/CardBase";
-import { Gender } from "../CalculateTree/CalculateTree";
+import { Gender, Person } from "../CalculateTree/CalculateTree";
 
-export default <T>(store: Store<T>, cancelCallback?: () => void, onSubmitCallback?: () => void) => {
+export default <T>(store: Store<T>, cancelCallback?: (datum: Person) => void, onSubmitCallback?: (datum: Person) => void) => {
   return new AddRelative(store, cancelCallback, onSubmitCallback);
 }
 
@@ -16,16 +16,16 @@ export type RelDefaults = {
 
 export class AddRelative<T> {
   private readonly store: any;
-  private cancelCallback: () => void;
-  private onSubmitCallback: () => void;
+  private cancelCallback: (datum: Person) => void;
+  private onSubmitCallback: (datum: Person) => void;
   private onChange?: () => void;
   public onCancel?: () => void;
-  private datum: null;
-  is_active: boolean;
+  private datum: Person;
+  public is_active: boolean;
   private store_data?: any;
-  private addRelLabels: RelDefaults;
+  private readonly addRelLabels: RelDefaults;
 
-  constructor(store: Store<T>, cancelCallback?: () => void, onSubmitCallback?: () => void) {
+  constructor(store: Store<T>, cancelCallback?: (datum: Person) => void, onSubmitCallback?: (datum: Person) => void) {
     this.store = store;
 
     this.cancelCallback = cancelCallback;
@@ -42,7 +42,7 @@ export class AddRelative<T> {
     this.addRelLabels = this.addRelLabelsDefault();
   }
 
-  activate(datum: any) {
+  activate(datum: Person) {
     if (this.is_active) {
       this.onCancel();
     }

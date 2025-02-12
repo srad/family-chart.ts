@@ -1,10 +1,11 @@
 import { select } from "d3";
 import addRelative, { AddRelative } from "./addRelative";
 import { cleanupDataJson, createForm, deletePerson } from "./form";
-import { DatumType, Store } from "../Cards/CardBase";
+import { Store } from "../Cards/CardBase";
 import { createHistory, createHistoryControls, History } from "./history";
 import { formInfoSetup } from "./formInfoSetup";
 import { Person } from "../CalculateTree/CalculateTree";
+import { DatumType } from "../view/Models/DatumType";
 
 export default function (cont: HTMLElement, store: Store<DatumType>) {
   return new EditTree(cont, store);
@@ -13,7 +14,7 @@ export default function (cont: HTMLElement, store: Store<DatumType>) {
 export class EditTree {
   private readonly cont: HTMLElement;
   protected store: Store<DatumType>;
-  private fields: ({ type: string; label: string; id: string } | { type: string; label: string; id: string } | { type: string; label: string; id: string } | { type: string; label: string; id: string })[];
+  private fields: ({ type: string; label: string; id: string })[];
   private form_cont?: HTMLElement;
   private is_fixed: boolean;
   private editFirst: boolean;
@@ -76,18 +77,19 @@ export class EditTree {
   }
 
   cardEditForm(datum: Person) {
-    const props: { onCancel?: () => void, addRelative?: AddRelative<DatumType>, deletePerson?: () => void } = {};
+    const props: { onCancel?: () => void, addRelative?: AddRelative<DatumType>, deletePerson?: (datum: Person, data_stash: Person[]) => { success: boolean, error?: string } } = {};
     const is_new_rel = datum?._new_rel_data;
     if (is_new_rel) {
       props.onCancel = () => this.addRelativeInstance.onCancel();
     } else {
       props.addRelative = this.addRelativeInstance;
-      props.deletePerson = (): void => {
+      props.deletePerson = (): { success: boolean, error?: string } => {
         const data = this.store.getData();
-        deletePerson(datum, data);
+        const result = deletePerson(datum, data);
         this.store.updateData(data);
         this.openFormWithId(this.store.getLastAvailableMainDatum().id);
         this.store.updateTree({});
+        return result;
       };
     }
 
@@ -237,7 +239,7 @@ export class EditTree {
     return this;
   }
 
-  addRelative(datum) {
+  addRelative(datum?: Person) {
     if (!datum) {
       datum = this.store.getMainDatum();
     }
@@ -246,17 +248,18 @@ export class EditTree {
   }
 
   setupAddRelative() {
-    return addRelative(this.store, cancelCallback.bind(this), onSubmitCallback.bind(this));
+    const that = this;
+    return addRelative(this.store, cancelCallback, onSubmitCallback);
 
-    function onSubmitCallback(datum, new_rel_datum) {
-      this.store.updateMainId(datum.id);
-      this.openFormWithId(datum.id);
+    function onSubmitCallback(datum: Person /*, new_rel_datum: Person*/) {
+      that.store.updateMainId(datum.id);
+      that.openFormWithId(datum.id);
     }
 
-    function cancelCallback(datum) {
-      this.store.updateMainId(datum.id);
-      this.store.updateTree({});
-      this.openFormWithId(datum.id);
+    function cancelCallback(datum: Person) {
+      that.store.updateMainId(datum.id);
+      that.store.updateTree({});
+      that.openFormWithId(datum.id);
     }
   }
 
